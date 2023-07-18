@@ -24,3 +24,20 @@ $$FPR = \frac{FP}{FP+TN} * 100\%$$, где *FP* - число ложных сра
 5. Деплой модели
 6. Поддержка
 
+# Домашнее задание 2
+
+Основные команды:
+
+**Создание бакета**
+
+`yc storage bucket create --name otus-mlops-hw2 --default-storage-class cold --max-size 161061273600 --public-read --public-list`
+
+**Копирование файлов с бакета на бакет**
+
+`s3cmd cp -r --acl-public s3://mlops-data/fraud-data s3://otus-mlops-hw2/`
+
+**Перемещение на hdfs**
+
+`hadoop distcp s3a://otus-mlops-hw2/fraud-data/ /user/ubuntu/input/`
+
+![image](https://github.com/Adgius/otus-mlops-hw1/assets/78685114/dfda7f39-5964-4100-b3ba-fb485d93ab6c)
