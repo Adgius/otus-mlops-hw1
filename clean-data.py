@@ -1,3 +1,9 @@
+import argparse
+parser = argparse.ArgumentParser(description='credentials')
+parser.add_argument('aws_access_key_id ', type=str, help='aws_access_key_id')
+parser.add_argument('aws_secret_access_key', type=str, help='aws_secret_access_key')
+args = parser.parse_args()
+
 import findspark
 findspark.init()
 findspark.find()
@@ -20,12 +26,11 @@ warnings.simplefilter('ignore')
 s3 = boto3.resource('s3',
                 endpoint_url='https://storage.yandexcloud.net',
                 region_name = 'ru-central1',
-                aws_access_key_id = 'YCAJEGyjDZ70buucdwAjU9B-c',
-                aws_secret_access_key = 'YCPfQDBIwyDGS-U0AHlXFZcn59PTI30ZP1tCpGN4'
+                aws_access_key_id = args.aws_access_key_id,
+                aws_secret_access_key = args.aws_secret_access_key
                 )
 
 data_bucket = s3.Bucket('mlops-data')
-output_bucket = s3.Bucket('otus-mlops-data-clear')
 
 
 try:
@@ -42,8 +47,8 @@ spark = SparkSession\
         .builder\
         .appName("mytestapp")\
         .config("fs.s3a.endpoint", "https://storage.yandexcloud.net")\
-        .config("fs.s3a.access.key","YCAJE7USrE24k_4tqmiboKRGp")\
-        .config("fs.s3a.secret.key","YCOONC7XxSz7ZvQhOyajrr4yifmRpuiGMyrCumrW")\
+        .config("fs.s3a.access.key", args.aws_access_key_id)\
+        .config("fs.s3a.secret.key", args.aws_secret_access_key)\
         .config("fs.s3a.acl.default", "BucketOwnerFullControl")\
         .getOrCreate()
 
