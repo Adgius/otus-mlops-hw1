@@ -17,10 +17,13 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import LinearRegression
 from pyspark.sql.window import Window
 
-
+import os
 import boto3
 import datetime as dt
 import warnings
+import subprocess
+
+print(subprocess.run(['hdfs', 'dfs', '-ls', 's3a://mlops-data/fraud-data']))
 
 warnings.simplefilter('ignore')
 s3 = boto3.resource('s3',
