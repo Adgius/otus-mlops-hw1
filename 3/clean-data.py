@@ -143,3 +143,11 @@ for data in data_bucket.objects.all():
     df = clear_data(df)
     filename = data.key.replace('.txt', '.parquet')
     df.coalesce(1).write.format('parquet').save(f"s3a://otus-mlops-data-clear/{data.key.replace('.txt', '.parquet')}", mode='overwrite')
+
+
+for data in data_bucket.objects.all():
+    if '_SUCCESS' not in data.key:
+        s3.meta.client.copy({'Bucket': 'otus-mlops-data-clear','Key': data.key}, 'otus-mlops-data-clear', data.key.split("/")[1])
+        s3.Object('otus-mlops-data-clear', data.key).delete()
+    else:
+        s3.Object('otus-mlops-data-clear', data.key).delete()
