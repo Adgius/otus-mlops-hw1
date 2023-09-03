@@ -1,6 +1,6 @@
 import argparse
 parser = argparse.ArgumentParser(description='credentials')
-parser.add_argument('aws_access_key_id', type=str, help='aws_access_key_id')
+parser.add_argument('aws_access_key_id ', type=str, help='aws_access_key_id')
 parser.add_argument('aws_secret_access_key', type=str, help='aws_secret_access_key')
 args = parser.parse_args()
 
@@ -17,13 +17,10 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import LinearRegression
 from pyspark.sql.window import Window
 
-import os
+
 import boto3
 import datetime as dt
 import warnings
-import subprocess
-
-print(subprocess.run(['hdfs', 'dfs', '-ls', 's3a://mlops-data/fraud-data']))
 
 warnings.simplefilter('ignore')
 s3 = boto3.resource('s3',
