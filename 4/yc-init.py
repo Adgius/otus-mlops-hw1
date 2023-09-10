@@ -12,7 +12,7 @@ with DAG(
     dagrun_timeout=timedelta(minutes=5),
     tags=['airflow-test'],
 ) as dag:
-    create_profile = BashOperator(
+    download = BashOperator(
         task_id='yc_download',
         bash_command='curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -h'
     )
@@ -44,7 +44,7 @@ with DAG(
         task_id='set_default_zone',
         bash_command='2',
     )
-    create_profile >> choice_new >> create_name >> set_oauth >> choice_folder >> compute_zone >> set_default_zone
+    download >> create_profile >> choice_new >> create_name >> set_oauth >> choice_folder >> compute_zone >> set_default_zone
 
 if __name__ == "__main__":
     dag.cli()
