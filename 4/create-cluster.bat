@@ -1,0 +1,23 @@
+yc dataproc cluster create \
+   --name=my-dataproc \
+   --zone=ru-central1-b \
+   --service-account-name=data-proc \
+   --version=2.0 \
+   --services=HDFS,YARN,MAPREDUCE,TEZ,SPARK \
+   --ssh-public-keys-file=C:/Users/Роман/.ssh/id_rsa.pub \
+   --subcluster name="master",`
+               `role=masternode,`
+               `resource-preset=s3-c2-m8,`
+               `disk-type=network-ssd,`
+               `disk-size=40,`
+               `subnet-name=hdfs-ru-central1-b,`
+               `assign-public-ip=true \
+   --subcluster name="data",`
+               `role=datanode,`
+               `resource-preset=s3-c4-m16,`
+               `disk-type=network-ssd,`
+               `disk-size=128,`
+               `subnet-name=hdfs-ru-central1-b,`
+               `assign-public-ip=false \
+   --security-group-ids=enp71tcdhpj838buvadk \
+   --deletion-protection=false
