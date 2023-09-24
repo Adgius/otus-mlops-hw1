@@ -20,10 +20,10 @@ def create_token():
 def get_folder_id(**kwargs):
     ti = kwargs['ti']
     clouds = json.loads(requests.get("https://resource-manager.api.cloud.yandex.net/resource-manager/v1/clouds",  
-        headers={"Authorization": f"Bearer {ti['iam_token']}"}).content)
+        headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"}).content)
     cloud_id = clouds['clouds'][0]['id']
     folders = json.loads(requests.get("https://resource-manager.api.cloud.yandex.net/resource-manager/v1/folders",  
-        headers={"Authorization": f"Bearer {ti['iam_token']}"},
+        headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"},
         params={'cloud_id': cloud_id}).content)
     folder_id = folders['folders'][0]['id']
     return folder_id
@@ -33,7 +33,7 @@ def get_folder_id(**kwargs):
 def create_cluster(**kwargs):
     ti = kwargs['ti']
     body = {
-    "folderId": ti['folder_id'], 
+    "folderId": ti.xcom_pull('get_folder_id'), 
     "name": "my-dataproc",
     "configSpec": {
         "versionId": "2.0",
@@ -77,21 +77,21 @@ def create_cluster(**kwargs):
     }
     cluster_info = json.loads(requests.post("https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters", 
        json=body, 
-       headers={"Authorization": f"Bearer {ti['iam_token']}"}).content)
+       headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"}).content)
     cluster_id = cluster_info['metadata']['clusterId']
     return cluster_id
 
 def get_masternode_ip(**kwargs):
     ti = kwargs['ti']
     cluster_hosts = json.loads(requests.get(f"https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters/{ti['cluster_id']}/hosts", 
-       headers={"Authorization": f"Bearer {ti['iam_token']}"}
+       headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"}
        ).content)
     for h in cluster_hosts['hosts']:
         if h['role'] == 'MASTERNODE':
             masternode_id = h['computeInstanceId']
             break
     masternode_info = json.loads(requests.get(f"https://compute.api.cloud.yandex.net/compute/v1/instances/{masternode_id}", 
-                                              headers={"Authorization": f"Bearer {ti['iam_token']}"}).content)
+                                              headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"}).content)
     masternode_ip = masternode_info['networkInterfaces'][0]['primaryV4Address']['oneToOneNat']['address']
     print(masternode_ip)
     return masternode_ip
