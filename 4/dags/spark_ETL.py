@@ -119,7 +119,10 @@ with DAG(
     await_cluster = BashOperator(task_id="await_cluster",
                                  bash_command="sleep 10m")
    
-
+    get_masternode_ip = PythonOperator(
+        task_id='get_masternode_ip',
+        python_callable=get_masternode_ip
+    )  
     get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip
 
 
