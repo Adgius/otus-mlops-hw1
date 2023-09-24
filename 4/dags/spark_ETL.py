@@ -17,6 +17,7 @@ def create_token():
     decode_response = response.content.decode('UTF-8')
     text = json.loads(decode_response) 
     iam_token = text.get('iamToken')
+    logger.info(response)
     expires_iam_token = text.get('expiresAt')
     return iam_token
 
