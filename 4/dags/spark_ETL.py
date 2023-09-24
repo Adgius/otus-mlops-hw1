@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 
 from datetime import datetime, timedelta
 
@@ -7,6 +8,8 @@ from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
+
+logger = logging.getLogger(__name__)
 
 def create_token():
     params = {'yandexPassportOauthToken': Variable.get('yc_token')}
@@ -21,6 +24,7 @@ def get_folder_id(**kwargs):
     ti = kwargs['ti']
     clouds = json.loads(requests.get("https://resource-manager.api.cloud.yandex.net/resource-manager/v1/clouds",  
         headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"}).content)
+    logger.info(clouds)
     cloud_id = clouds['clouds'][0]['id']
     folders = json.loads(requests.get("https://resource-manager.api.cloud.yandex.net/resource-manager/v1/folders",  
         headers={"Authorization": f"Bearer {ti.xcom_pull('create_token')}"},
