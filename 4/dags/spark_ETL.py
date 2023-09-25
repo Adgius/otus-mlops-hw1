@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.contrib.hooks import SSHHook
+from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
