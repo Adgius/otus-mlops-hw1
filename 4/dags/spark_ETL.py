@@ -89,7 +89,7 @@ def create_cluster(**kwargs):
 
 def get_masternode_ip(**kwargs):
     ti = kwargs['ti']
-    cluster_hosts = json.loads(requests.get(f"https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters/{ti['cluster_id']}/hosts", 
+    cluster_hosts = json.loads(requests.get(f"https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters/{ti.xcom_pull('cluster_id')}/hosts", 
        headers={"Authorization": f"Bearer {ti.xcom_pull('get_token')}"}
        ).content)
     for h in cluster_hosts['hosts']:
