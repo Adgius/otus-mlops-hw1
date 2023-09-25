@@ -5,9 +5,14 @@ import logging
 from datetime import datetime, timedelta
 
 from airflow import DAG
+from airflow.contrib.hooks import SSHHook
+from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import Variable
+from airflow import models
+from airflow import settings
+
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +108,29 @@ def get_masternode_ip(**kwargs):
     print(masternode_ip)
     return masternode_ip
 
+def create_ssh_connection(**kwargs):
+    ti = kwargs['ti']
+    conn = models.Connection(
+        conn_id='cluster_ssh_connection',
+        conn_type='ssh',
+        host=ti.xcom_pull('get_masternode_ip'),
+        login='ubuntu',
+        port=22
+        extra={
+            'key_file': '/opt/airflow/.ssh/id_rsa',
+            "conn_timeout": "10",
+            "compress": "false",
+            "look_for_keys": "false",
+            "allow_host_key_change": "false",
+            "disabled_algorithms": {"pubkeys": ["rsa-sha2-256", "rsa-sha2-512"]},
+            "ciphers": ["aes128-ctr", "aes192-ctr", "aes256-ctr"]
+        }
+    )
+
+    session = settings.Session()
+    session.add(conn)
+    session.commit()
+
 with DAG(
     dag_id='spark_ETL',
     schedule_interval='@once',
@@ -125,12 +153,23 @@ with DAG(
     )  
     await_cluster = BashOperator(task_id="await_cluster",
                                  bash_command="sleep 10m")
-   
     get_masternode_ip = PythonOperator(
         task_id='get_masternode_ip',
         python_callable=get_masternode_ip
-    )  
-    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip
+    )
+    create_ssh_connection = PythonOperator(
+        task_id='create_ssh_connection',
+        python_callable=create_ssh_connection
+    ) 
+    ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
+    sftp_task = SFTPOperator(
+        task_id='sftp_transfer',
+        ssh_hook=ssh_hook,
+        local_filepath='/opt/airflow/data/clean-data.py',
+        remote_filepath='/home/ubuntu/clean-data.py',
+        operation='put'
+    )
+    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip >> create_ssh_connection >> sftp_task
 
 
 if __name__ == "__main__":
