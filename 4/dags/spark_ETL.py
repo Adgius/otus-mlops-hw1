@@ -115,7 +115,7 @@ def create_ssh_connection(**kwargs):
         conn_type='ssh',
         host=ti.xcom_pull('get_masternode_ip'),
         login='ubuntu',
-        port=22
+        port=22,
         extra={
             'key_file': '/opt/airflow/.ssh/id_rsa',
             "conn_timeout": "10",
