@@ -9,6 +9,7 @@ from airflow.contrib.hooks.ssh_hook import SSHHook
 from airflow.contrib.operators.sftp_operator import SFTPOperator
 from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
+from airflow.sensors.python import PythonSensor
 from airflow.models import Variable
 from airflow import models
 from airflow import settings
@@ -92,6 +93,14 @@ def create_cluster(**kwargs):
     cluster_id = cluster_info['metadata']['clusterId']
     return cluster_id
 
+def success_callable(**kwargs):
+        ti = kwargs['ti']
+        cluster_hosts = json.loads(requests.get(f"https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters/{ti.xcom_pull('create_cluster')}/hosts", 
+        headers={"Authorization": f"Bearer {ti.xcom_pull('get_token')}"}).content)
+        for h in cluster_hosts['hosts']:
+            if h['role'] == 'MASTERNODE':
+                return 'computeInstanceId' in h
+
 def get_masternode_ip(**kwargs):
     ti = kwargs['ti']
     cluster_hosts = json.loads(requests.get(f"https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters/{ti.xcom_pull('create_cluster')}/hosts", 
@@ -152,8 +161,7 @@ with DAG(
         task_id='create_cluster',
         python_callable=create_cluster
     )  
-    await_cluster = BashOperator(task_id="await_cluster",
-                                 bash_command="sleep 10m")
+    await_cluster = PythonSensor(task_id="await_cluster", python_callable=success_callable, poke_interval=60, timeout=900)
     get_masternode_ip = PythonOperator(
         task_id='get_masternode_ip',
         python_callable=get_masternode_ip
