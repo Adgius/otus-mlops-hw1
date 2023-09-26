@@ -9,7 +9,7 @@ from airflow.contrib.operators.sftp_operator import SFTPOperator
 ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
 
 with DAG(
-        dag_id='spark_ETL',
+        dag_id='spark_ssh',
         schedule_interval='@once',
         start_date=datetime(2023, 9, 24),
         catchup=False,
