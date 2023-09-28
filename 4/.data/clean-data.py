@@ -1,4 +1,4 @@
-# coding: utf8
+# coding: cp1251
 
 import argparse
 import os
