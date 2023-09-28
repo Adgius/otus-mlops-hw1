@@ -1,9 +1,5 @@
 # coding: utf8
 
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 import argparse
 import os
 parser = argparse.ArgumentParser(description='credentials')
@@ -145,7 +141,7 @@ def clear_data(df):
     return df
 
 for data in data_bucket.objects.all():
-    print(f'========= {data.key} ========')
+    print(data.key)
     df = read_csv(data)
     df = clear_data(df)
     filename = data.key.replace('.txt', '.parquet')
