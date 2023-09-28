@@ -29,12 +29,16 @@ with DAG(
                 operation='put'
             )
 
-
-    ssh_task = SSHOperator(
-                task_id="execute",
+    ssh_task1 = SSHOperator(
+                task_id="execute findspark",
                 command=f'pip install findspark & python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
                 ssh_hook=ssh_hook)
     
-    sftp_task >> ssh_task
+    ssh_task2 = SSHOperator(
+                task_id="execute script",
+                command=f'pip install findspark & python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
+                ssh_hook=ssh_hook)
+    
+    sftp_task >> ssh_task1 >> ssh_task2
 if __name__ == "__main__":
     dag.cli()
