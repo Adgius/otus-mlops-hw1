@@ -63,7 +63,7 @@ x-airflow-common:
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
-    AIRFLOW_CONN_CLUSTER_SSH_CONNECTION: 'ssh://ubuntu@somehost:22'
+    # AIRFLOW_CONN_CLUSTER_SSH_CONNECTION: 'ssh://ubuntu@somehost:22'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
@@ -81,6 +81,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/.ssh:/opt/airflow/.ssh
     - ${AIRFLOW_PROJ_DIR:-.}/.data:/opt/airflow/data
   user: "${AIRFLOW_UID:-50000}:0"
+  command: airflow connections add cluster_ssh_connection --conn-uri 'ssh://ubuntu@somehost:22'
   depends_on:
     &airflow-common-depends-on
     redis:

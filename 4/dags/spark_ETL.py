@@ -172,7 +172,7 @@ with DAG(
     )
     delete_fake_connection = BashOperator(
         task_id="delete_fake_connection",
-        bash_command="unset AIRFLOW_CONN_CLUSTER_SSH_CONNECTION",
+        bash_command="airflow connections delete cluster_ssh_connection",
     )
     create_ssh_connection = PythonOperator(
         task_id='create_ssh_connection',
