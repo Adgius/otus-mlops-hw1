@@ -13,7 +13,9 @@ ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection')
 def run_remote_script():
     aws_access_key_id = Variable.get('aws_access_key_id')
     aws_secret_access_key = Variable.get('aws_secret_access_key')
-    ssh_hook.exec_ssh_client_command(f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}')
+    ssh_hook.exec_ssh_client_command(command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
+                                     get_pty=True,
+                                     environment=None)
 
 with DAG(
         dag_id='run_script',
