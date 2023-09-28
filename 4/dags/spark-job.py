@@ -37,7 +37,8 @@ with DAG(
     ssh_task2 = SSHOperator(
                 task_id="execute_script",
                 command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
-                ssh_hook=ssh_hook)
+                ssh_hook=ssh_hook,
+                get_pty=True)
     
     sftp_task >> ssh_task1 >> ssh_task2
 if __name__ == "__main__":
