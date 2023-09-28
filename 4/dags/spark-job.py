@@ -17,7 +17,7 @@ def run_remote_script():
 
 with DAG(
         dag_id='run_script',
-        schedule_interval='@once',
+        schedule_interval='*/20 * * * *',
         start_date=datetime(2023, 9, 24),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
