@@ -166,16 +166,12 @@ with DAG(
         task_id='get_masternode_ip',
         python_callable=get_masternode_ip
     )
-    delete_fake_connection = BashOperator(
-        task_id="delete_fake_connection",
-        bash_command="airflow connections delete cluster_ssh_connection",
-    )
     create_ssh_connection = PythonOperator(
         task_id='create_ssh_connection',
         python_callable=create_ssh_connection
     ) 
 
-    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip >> delete_fake_connection >> create_ssh_connection
+    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip >> create_ssh_connection
 
 
 if __name__ == "__main__":
