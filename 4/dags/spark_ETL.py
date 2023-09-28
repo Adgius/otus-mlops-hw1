@@ -140,13 +140,9 @@ def create_ssh_connection(**kwargs):
     session.add(conn)
     session.commit()
 
-def use_connection():
-    ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
-    return ssh_hook
-    # Now you can use `conn` to interact with your database
 
 with DAG(
-    dag_id='spark_ETL',
+    dag_id='create-spark-cluster',
     schedule_interval='@once',
     start_date=datetime(2023, 9, 24),
     catchup=False,
@@ -178,15 +174,8 @@ with DAG(
         task_id='create_ssh_connection',
         python_callable=create_ssh_connection
     ) 
-    sftp_task = SFTPOperator(
-                task_id='sftp_transfer',
-                ssh_hook=use_connection(),
-                local_filepath='/opt/airflow/data/clean-data.py',
-                remote_filepath='/home/ubuntu/clean-data.py',
-                operation='put'
-            )
 
-    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip >> delete_fake_connection >> create_ssh_connection >> sftp_task
+    get_token >> get_folder_id >> create_cluster >> await_cluster >> get_masternode_ip >> delete_fake_connection >> create_ssh_connection
 
 
 if __name__ == "__main__":

@@ -81,7 +81,6 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/.ssh:/opt/airflow/.ssh
     - ${AIRFLOW_PROJ_DIR:-.}/.data:/opt/airflow/data
   user: "${AIRFLOW_UID:-50000}:0"
-  command: airflow connections add cluster_ssh_connection --conn-uri 'ssh://ubuntu@somehost:22'
   depends_on:
     &airflow-common-depends-on
     redis:

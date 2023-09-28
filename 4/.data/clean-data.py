@@ -80,6 +80,7 @@ def read_csv(s3obj):
     bad_header =  rdd.first()
     rdd = rdd.filter(lambda line: line != bad_header)
     temp_var = rdd.map(lambda row: row.split(","))
+    temp_var = temp_var.limit(100000)
     temp_var = temp_var.map(lambda row: (
                                      try_convert(row[0], int),
                                      fix_date(row[1]), 
