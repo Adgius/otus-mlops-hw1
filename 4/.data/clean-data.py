@@ -77,7 +77,7 @@ def try_convert(x, func):
         return float('nan')
 
 def read_csv(s3obj):
-    rdd = sc.textFile(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key)).limit(100000)
+    rdd = sc.textFile(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key)).take(100000)
     bad_header =  rdd.first()
     rdd = rdd.filter(lambda line: line != bad_header)
     temp_var = rdd.map(lambda row: row.split(","))
