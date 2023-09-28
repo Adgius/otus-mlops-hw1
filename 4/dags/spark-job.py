@@ -30,12 +30,12 @@ with DAG(
             )
 
     ssh_task1 = SSHOperator(
-                task_id="execute findspark",
+                task_id="execute_findspark",
                 command='pip install findspark',
                 ssh_hook=ssh_hook)
     
     ssh_task2 = SSHOperator(
-                task_id="execute script",
+                task_id="execute_script",
                 command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
                 ssh_hook=ssh_hook)
     
