@@ -32,7 +32,7 @@ with DAG(
 
     ssh_task = SSHOperator(
                 task_id="execute",
-                bash_command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
+                command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
                 ssh_hook=ssh_hook)
     
     sftp_task >> ssh_task
