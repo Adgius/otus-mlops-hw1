@@ -1,4 +1,4 @@
-# coding: cp1251
+# coding: utf8
 
 import argparse
 import os
@@ -109,7 +109,7 @@ def find_time_outliers(df, n=4):
     df = df.withColumn('tx_datetime', F.unix_timestamp(df.tx_datetime))
     assembler = VectorAssembler(inputCols=['tx_datetime'],
                                 outputCol='features')
-    df = assembler.transform(df) # Чтоб быстрее считалась
+    df = assembler.transform(df) 
     train = df.limit(10000)
 
     lin_reg = LinearRegression(
@@ -137,7 +137,7 @@ def clear_data(df):
                            F.when(F.col('tx_amount') > tx_amount_q99, tx_amount_q99)\
                           .otherwise(F.col('tx_amount')))
     df = find_time_outliers(df)
-    print('Затрачено минут:', (dt.datetime.now() - time).seconds / 60)
+    print('Minutes spent:', (dt.datetime.now() - time).seconds / 60)
     return df
 
 for data in data_bucket.objects.all():
