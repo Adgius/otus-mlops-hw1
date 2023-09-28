@@ -1,3 +1,5 @@
+# coding: utf8
+
 import argparse
 import os
 parser = argparse.ArgumentParser(description='credentials')
@@ -107,7 +109,7 @@ def find_time_outliers(df, n=4):
     df = df.withColumn('tx_datetime', F.unix_timestamp(df.tx_datetime))
     assembler = VectorAssembler(inputCols=['tx_datetime'],
                                 outputCol='features')
-    df = assembler.transform(df)
+    df = assembler.transform(df) # Чтоб быстрее считалась
     train = df.limit(10000)
 
     lin_reg = LinearRegression(
