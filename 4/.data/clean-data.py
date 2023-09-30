@@ -103,7 +103,7 @@ def read_csv(s3obj):
                          StructField('tx_time_days', FloatType(), True),
                          StructField('tx_fraud', FloatType(), True),
                          StructField('tx_fraud_scenario', FloatType(), True),])
-    return spark.createDataFrame(temp_var, schema).limit(100000)
+    return spark.createDataFrame(temp_var, schema).limit(10000)
 
 def find_time_outliers(df, n=4):
     df = df.withColumn('tx_datetime', F.unix_timestamp(df.tx_datetime))
