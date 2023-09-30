@@ -31,7 +31,7 @@ s3 = boto3.resource('s3',
                 )
 
 data_bucket = s3.Bucket('mlops-data')
-
+output_bucket = s3.Bucket('otus-mlops-data-clear')
 
 try:
     sc = SparkContext()
@@ -145,7 +145,7 @@ for data in data_bucket.objects.all():
     df.coalesce(1).write.format('parquet').save(f"s3a://otus-mlops-data-clear/{data.key.replace('.txt', '.parquet')}", mode='overwrite')
 
 
-for data in data_bucket.objects.all():
+for data in output_bucket.objects.all():
     if '_SUCCESS' not in data.key:
         s3.meta.client.copy({'Bucket': 'otus-mlops-data-clear','Key': data.key}, 'otus-mlops-data-clear', data.key.split("/")[1])
         s3.Object('otus-mlops-data-clear', data.key).delete()
