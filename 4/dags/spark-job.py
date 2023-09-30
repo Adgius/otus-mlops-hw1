@@ -36,7 +36,7 @@ with DAG(
     
     ssh_task2 = SSHOperator(
                 task_id="execute_script",
-                command=f'python -c /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
+                command="python /home/ubuntu/clean-data.py {} {}".format(aws_access_key_id, aws_secret_access_key),
                 ssh_hook=ssh_hook,
                 get_pty=False)
     
