@@ -36,7 +36,7 @@ with DAG(
     
     ssh_task2 = SSHOperator(
                 task_id="execute_script",
-                command="python /home/ubuntu/clean-data.py {} {}".format(aws_access_key_id, aws_secret_access_key),
+                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(aws_access_key_id, aws_secret_access_key), # Почему-то в системе стоят два питона
                 ssh_hook=ssh_hook,
                 get_pty=False)
     
