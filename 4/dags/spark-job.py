@@ -39,7 +39,7 @@ with DAG(
                 task_id="execute",
                 command=f'/usr/bin/python -c "/home/ubuntu/clean-data.py" {aws_access_key_id} {aws_secret_access_key}',
                 ssh_hook=ssh_hook,
-                get_pty=True)
+                get_pty=False)
     
     # execute_script = BashOperator(
     #     task_id="execute_script",
