@@ -25,8 +25,8 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath='/opt/airflow/data/clean-data.py',
-                remote_filepath='/home/ubuntu/clean-data.py',
+                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/start.py'],
+                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/start.py'],
                 operation='put'
             )
 
@@ -37,7 +37,7 @@ with DAG(
     
     ssh_task2 = SSHOperator(
                 task_id="execute",
-                command=f'python /home/ubuntu/clean-data.py {aws_access_key_id} {aws_secret_access_key}',
+                command=f'python /home/ubuntu/start.py {aws_access_key_id} {aws_secret_access_key}',
                 ssh_hook=ssh_hook,
                 get_pty=True)
     
