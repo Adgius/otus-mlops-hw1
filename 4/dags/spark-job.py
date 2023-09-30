@@ -41,11 +41,11 @@ with DAG(
                 ssh_hook=ssh_hook,
                 get_pty=True)
     
-    execute_script = BashOperator(
-        task_id="execute_script",
-        bash_command=f"ssh ubuntu@{{ ti.xcom_pull(\'get_masternode_ip\') }} \'python\' \'/home/ubuntu/clean-data.py\' \'{aws_access_key_id}\' \'{aws_secret_access_key}\'",
-    )
+    # execute_script = BashOperator(
+    #     task_id="execute_script",
+    #     bash_command=f"ssh ubuntu@{{ ti.xcom_pull(\'get_masternode_ip\') }} \'python\' \'/home/ubuntu/clean-data.py\' \'{aws_access_key_id}\' \'{aws_secret_access_key}\'",
+    # )
     
-    sftp_task >> ssh_task1 >> execute_script
+    sftp_task >> ssh_task1 >> ssh_task2 #execute_script
 if __name__ == "__main__":
     dag.cli()
