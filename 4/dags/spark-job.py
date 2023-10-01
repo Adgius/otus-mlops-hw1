@@ -14,7 +14,7 @@ aws_secret_access_key = Variable.get('aws_secret_access_key')
 
 with DAG(
         dag_id='run_script',
-        schedule_interval='0 7 * * *',
+        schedule_interval='0 6 * * *',
         start_date=datetime(2023, 9, 30),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
