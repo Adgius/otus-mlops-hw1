@@ -302,7 +302,7 @@ services:
   postgres_mlflow:
     image: postgres:14.8-alpine3.18
     environment:
-      POSTGRES_DB: "mlflow_"
+      POSTGRES_DB: "mlflow_db"
       POSTGRES_USER: "mlflow_user"
       POSTGRES_PASSWORD: "mlflow_pw"
     ports:
