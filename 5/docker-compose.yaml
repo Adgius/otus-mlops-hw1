@@ -307,6 +307,21 @@ services:
       POSTGRES_PASSWORD: "mlflow_pw"
     ports:
       - "5432:5432"
+      
+  mlflow_server:
+    restart: always
+    build: ./mlflow
+    image: mlflow_server
+    container_name: mlflow_server
+    depends_on:
+        - postgres_mlflow
+    ports:
+        - "5000:5000"
+    environment:
+        - MLFLOW_S3_ENDPOINT_URL=https://storage.yandexcloud.net
+        - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+        - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@127.0.0.1:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@127.0.0.1:5432/mlflow_db --default-artifact-root s3://mlflow-otus-test --no-serve-artifacts --host 0.0.0.0
 
 volumes:
   postgres-db-volume:
