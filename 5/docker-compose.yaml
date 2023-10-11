@@ -300,13 +300,13 @@ services:
         condition: service_completed_successfully
 
   postgres_mlflow:
-  image: postgres:14.8-alpine3.18
-  environment:
-    POSTGRES_DB: "mlflow_"
-    POSTGRES_USER: "mlflow_user"
-    POSTGRES_PASSWORD: "mlflow_pw"
-  ports:
-    - "5432:5432"
+    image: postgres:14.8-alpine3.18
+    environment:
+      POSTGRES_DB: "mlflow_"
+      POSTGRES_USER: "mlflow_user"
+      POSTGRES_PASSWORD: "mlflow_pw"
+    ports:
+      - "5432:5432"
 
 volumes:
   postgres-db-volume:
