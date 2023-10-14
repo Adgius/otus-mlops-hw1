@@ -82,7 +82,7 @@ def create_cluster(**kwargs):
             "resources": {
             "resourcePresetId": "s3-c4-m16",
             "diskTypeId": "network-ssd",
-            "diskSize": "67108864"
+            "diskSize": "68719476736"
             },
             "subnetId": "e2l9t3irqejhg9s3trbp",  # Auto-created default subnet for zone ru-central1-b
             "hostsCount": "2",
@@ -101,6 +101,7 @@ def create_cluster(**kwargs):
     cluster_info = json.loads(requests.post("https://dataproc.api.cloud.yandex.net/dataproc/v1/clusters", 
        json=body, 
        headers={"Authorization": f"Bearer {ti.xcom_pull('get_token')}"}).content)
+    logger.info(cluster_info)
     cluster_id = cluster_info['metadata']['clusterId']
     return cluster_id
 
