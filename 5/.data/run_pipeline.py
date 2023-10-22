@@ -2,10 +2,6 @@
 
 import argparse
 
-import findspark
-findspark.init()
-findspark.find()
-
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql import functions as F
 from pyspark.ml import Pipeline, Transformer
