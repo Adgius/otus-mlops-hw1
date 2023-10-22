@@ -16,6 +16,10 @@ MLFLOW_URL=os.getenv('MLFLOW_URL')
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+# To hide logs
+Variable.set('AWS_ACCESS_KEY_ID', AWS_ACCESS_KEY_ID)
+Variable.set('AWS_SECRET_ACCESS_KEY', AWS_SECRET_ACCESS_KEY)
+
 with DAG(
         dag_id='run_script',
         schedule_interval='0 6 * * *',
@@ -40,13 +44,14 @@ with DAG(
     
     ssh_task2 = SSHOperator(
                 task_id="execute_ETL",
-                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY), # Почему-то в системе стоят два питона
+                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")), # Почему-то в системе стоят два питона
                 ssh_hook=ssh_hook,
                 get_pty=False)
     
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="spark-submit --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY),
+            command="spark-submit --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, 
+                                                                                                                                           Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")),
             ssh_hook=ssh_hook,
             get_pty=False)
     

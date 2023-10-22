@@ -75,7 +75,7 @@ def create_cluster(**kwargs):
             "diskSize": "137438953472"
             },
             "subnetId": "e2l9t3irqejhg9s3trbp",  # Auto-created default subnet for zone ru-central1-b
-            "hostsCount": "3",
+            "hostsCount": "1",
             "assignPublicIp": False
         }
         ]
