@@ -33,10 +33,6 @@ import boto3
 import warnings
 warnings.simplefilter('ignore')
 
-import subprocess
-import sys
-
-subprocess.check_call([sys.executable, "-m", "pip", "install", 'numpy'])
 
 features = ['tx_amount', 'tx_time_seconds_prev', 'tx_time_seconds_duration', 'tx_amount_prev', 
 'tx_amount_duration', 'tx_time_seconds_diff', 'tx_amount_diff', 
@@ -104,7 +100,7 @@ def main(args):
                     )
     data_bucket = s3.Bucket(input_bucket)
 
-    mlflow.set_tracking_uri('{}:5000'.format(args.mlflow_tracking_uri))
+    mlflow.set_tracking_uri('http://{}:5000'.format(args.mlflow_tracking_uri))
 
     # If experiment does not exist
     try:
