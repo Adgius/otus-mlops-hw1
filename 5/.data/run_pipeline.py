@@ -99,7 +99,7 @@ def main(args):
                     )
     data_bucket = s3.Bucket(input_bucket)
 
-    mlflow.set_tracking_uri(f'{args.mlflow_tracking_uri}:5000')
+    mlflow.set_tracking_uri('{}:5000'.format(args.mlflow_tracking_uri))
 
     # If experiment does not exist
     try:
@@ -126,7 +126,7 @@ def main(args):
         logger.info("Loading Data ...")
         dfs = []
         for data in data_bucket.objects.all():
-            dfs.append(sql.read.parquet(f's3a://{input_bucket}/{data.key}').limit(100000))
+            dfs.append(sql.read.parquet('s3a://{}/{}'.format(input_bucket, data.key)).limit(100000))
             break
         df = reduce(DataFrame.unionAll, dfs)
 
