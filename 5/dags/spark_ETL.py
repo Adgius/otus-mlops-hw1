@@ -1,6 +1,7 @@
 import requests
 import json
 import logging
+import os
 
 from datetime import datetime, timedelta
 
@@ -51,7 +52,7 @@ def create_cluster(**kwargs):
         "versionId": "2.0",
         "hadoop": {
         "sshPublicKeys": [
-            Variable.get('ssh-key')
+            os.getenv('SSH_KEY')
             ]
         },
         "subclustersSpec": [
