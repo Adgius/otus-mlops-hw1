@@ -39,11 +39,13 @@ attributes = features + [target]
 
 class FeatureGenerator(Transformer, MLReadable, MLWritable):
 
-    def __init__(self, features: Iterable[str]):
+    #def __init__(self, features: Iterable[str]):
+    def __init__(self, features):
         super(FeatureGenerator, self).__init__()
         self.features = features
 
-    def _transform(self, df: DataFrame) -> DataFrame:                      
+    #def _transform(self, df: DataFrame) -> DataFrame:     
+    def _transform(self, df):                   
         w1 = Window().partitionBy("customer_id").orderBy(F.asc("tx_time_seconds"))
         w2 = Window().partitionBy("terminal_id").orderBy(F.asc("tx_time_seconds"))
         w3 = Window().partitionBy('customer_id').orderBy(F.asc('tx_time_seconds')).rowsBetween(1, 3)
