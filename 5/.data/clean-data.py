@@ -147,12 +147,12 @@ for data in data_bucket.objects.all():
     df = clear_data(df)
     filename = data.key.replace('.txt', '.parquet')
     print("s3a://{}/{}".format(output_bucket, filename))
-    df.coalesce(1).write.format('parquet').save("s3a://{}/{}".format(output_bucket, filename), mode='overwrite')
+    df.coalesce(1).write.format('parquet').save("s3a://{}/{}".format(output_bucket.name, filename), mode='overwrite')
 
 
 for data in output_bucket.objects.all():
     if '_SUCCESS' not in data.key:
-        s3.meta.client.copy({'Bucket': output_bucket,'Key': data.key}, output_bucket, data.key.split("/")[1])
+        s3.meta.client.copy({'Bucket': output_bucket.name,'Key': data.key}, output_bucket.name, data.key.split("/")[1])
         s3.Object('test-4-otus', data.key).delete()
     else:
         s3.Object('test-4-otus', data.key).delete()
