@@ -155,7 +155,7 @@ def main(args):
         # Log params, metrics and model with MLFlow
 
         run_id = mlflow.active_run().info.run_id
-        logger.info(f"Logging optimal parameters to MLflow run {run_id} ...")
+        logger.info("Logging optimal parameters to MLflow run {} ...".format(run_id))
 
         best_regParam = model.bestModel.stages[-1].getRegParam()
         best_fitIntercept = model.bestModel.stages[-1].getFitIntercept()
@@ -172,9 +172,9 @@ def main(args):
         logger.info("Scoring the model ...")
         predictions = model.transform(df)
         metric = evaluator.evaluate(predictions)
-        logger.info(f"Logging metrics to MLflow run {run_id} ...")
+        logger.info("Logging metrics to MLflow run {} ...".format(run_id))
         mlflow.log_metric("areaUnderROC", metric)
-        logger.info(f"Model areaUnderROC: {metric}")
+        logger.info("Model areaUnderROC: {}".format(metric))
 
         logger.info("Saving model ...")
         mlflow.spark.save_model(model.bestModel.stages[-1], output_artifact)
