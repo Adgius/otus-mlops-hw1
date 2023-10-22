@@ -29,6 +29,11 @@ import boto3
 import warnings
 warnings.simplefilter('ignore')
 
+import subprocess
+import sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", 'numpy'])
+
 features = ['tx_amount', 'tx_time_seconds_prev', 'tx_time_seconds_duration', 'tx_amount_prev', 
 'tx_amount_duration', 'tx_time_seconds_diff', 'tx_amount_diff', 
 'tx_time_seconds_mean', 'tx_amount_mean', 'terminal_id_prev', 'terminal_id_amount_mean', 'terminal_id_time_mean']
