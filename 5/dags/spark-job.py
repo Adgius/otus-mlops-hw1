@@ -1,3 +1,5 @@
+import os
+
 from datetime import datetime, timedelta
 
 from airflow import DAG
@@ -9,8 +11,10 @@ from airflow.operators.bash import BashOperator
 
 
 ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
-aws_access_key_id = Variable.get('aws_access_key_id')
-aws_secret_access_key = Variable.get('aws_secret_access_key')
+
+MLFLOW_URL=os.getenv('MLFLOW_URL')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
 with DAG(
         dag_id='run_script',
@@ -24,22 +28,28 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath='/opt/airflow/data/clean-data.py',
-                remote_filepath='/home/ubuntu/clean-data.py',
+                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
+                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
                 operation='put'
             )
 
     ssh_task1 = SSHOperator(
-                task_id="execute_findspark",
-                command='pip install findspark',
+                task_id="installing_python_libs",
+                command='pip install mlflow==1.27.0 findspark urllib3==1.25.8 --use-feature=2020-resolver',
                 ssh_hook=ssh_hook)
     
     ssh_task2 = SSHOperator(
-                task_id="execute_script",
-                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(aws_access_key_id, aws_secret_access_key), # Почему-то в системе стоят два питона
+                task_id="execute_ETL",
+                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY), # Почему-то в системе стоят два питона
                 ssh_hook=ssh_hook,
                 get_pty=False)
     
-    sftp_task >> ssh_task1 >> ssh_task2
+    ssh_task3 = SSHOperator(
+            task_id="train_model",
+            command="spark-submit --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY),
+            ssh_hook=ssh_hook,
+            get_pty=False)
+    
+    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
 if __name__ == "__main__":
     dag.cli()
