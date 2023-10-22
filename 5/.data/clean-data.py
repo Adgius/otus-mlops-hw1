@@ -146,7 +146,8 @@ for data in data_bucket.objects.all():
     df = read_csv(data)
     df = clear_data(df)
     filename = data.key.replace('.txt', '.parquet')
-    df.coalesce(1).write.format('parquet').save("s3a://{}/{}".format(output_bucket, data.key.replace('.txt', '.parquet')), mode='overwrite')
+    print("s3a://{}/{}".format(output_bucket, filename))
+    df.coalesce(1).write.format('parquet').save("s3a://{}/{}".format(output_bucket, filename), mode='overwrite')
 
 
 for data in output_bucket.objects.all():
