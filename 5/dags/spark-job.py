@@ -40,7 +40,8 @@ with DAG(
     ssh_task1 = SSHOperator(
                 task_id="installing_python_libs",
                 command='pip install mlflow==1.27.0 findspark urllib3==1.25.8',
-                ssh_hook=ssh_hook)
+                ssh_hook=ssh_hook
+                ,cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
                 task_id="execute_ETL",
