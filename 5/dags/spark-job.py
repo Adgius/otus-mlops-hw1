@@ -40,21 +40,23 @@ with DAG(
     ssh_task1 = SSHOperator(
                 task_id="installing_python_libs",
                 command='pip install mlflow==1.27.0 findspark urllib3==1.25.8',
-                ssh_hook=ssh_hook
-                ,cmd_timeout=None)
+                ssh_hook=ssh_hook,
+                cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
                 task_id="execute_ETL",
                 command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")), # Почему-то в системе стоят два питона
                 ssh_hook=ssh_hook,
-                get_pty=False)
+                get_pty=False,
+                cmd_timeout=None)
     
     ssh_task3 = SSHOperator(
             task_id="train_model",
             command="spark-submit --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, 
                                                                                                                                            Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")),
             ssh_hook=ssh_hook,
-            get_pty=False)
+            get_pty=False,
+            cmd_timeout=None)
     
     sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
 if __name__ == "__main__":
