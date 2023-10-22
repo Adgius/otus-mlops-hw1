@@ -34,7 +34,7 @@ s3 = boto3.resource('s3',
                 )
 
 data_bucket = s3.Bucket('mlops-data')
-output_bucket = s3.Bucket('test-4-otus')
+output_bucket = s3.Bucket('mlflow-otus-test/data')
 
 try:
     sc = SparkContext()
@@ -151,7 +151,7 @@ for data in data_bucket.objects.all():
 
 for data in output_bucket.objects.all():
     if '_SUCCESS' not in data.key:
-        s3.meta.client.copy({'Bucket': 'test-4-otus','Key': data.key}, 'test-4-otus', data.key.split("/")[1])
+        s3.meta.client.copy({'Bucket': output_bucket,'Key': data.key}, output_bucket, data.key.split("/")[1])
         s3.Object('test-4-otus', data.key).delete()
     else:
         s3.Object('test-4-otus', data.key).delete()
