@@ -52,7 +52,7 @@ with DAG(
     
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="spark-submit --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, 
+            command="/opt/conda/bin/python /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, 
                                                                                                                                            Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")),
             ssh_hook=ssh_hook,
             get_pty=False,
