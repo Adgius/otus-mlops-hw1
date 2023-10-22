@@ -184,9 +184,9 @@ def main(args):
         logger.info("Saving model ...")
         mlflow.spark.save_model(model.bestModel.stages[-1], output_artifact)
 
-        logger.info("Exporting/logging model ...")
-        mlflow.spark.log_model(model.bestModel.stages[-1], output_artifact)
-        logger.info("Done")
+        # logger.info("Exporting/logging model ...")
+        # mlflow.spark.log_model(model.bestModel.stages[-1], output_artifact)
+        # logger.info("Done")
 
 if __name__ == "__main__":
 
