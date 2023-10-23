@@ -39,20 +39,20 @@ with DAG(
 
     ssh_task1 = SSHOperator(
                 task_id="installing_python_libs",
-                command='pip install mlflow==1.27.0 findspark urllib3==1.25.8 pyyaml',
+                command='python3 -m pip install mlflow==1.27.0 findspark urllib3==1.25.8 pyyaml',
                 ssh_hook=ssh_hook,
                 cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
                 task_id="execute_ETL",
-                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")), # Почему-то в системе стоят два питона
+                command="python3 /home/ubuntu/clean-data.py {} {}".format(Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")), # Почему-то в системе стоят два питона
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
     
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="/opt/conda/bin/python /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")),
+            command="python3 /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {}".format('baseline', MLFLOW_URL, Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")),
             ssh_hook=ssh_hook,
             get_pty=False,
             cmd_timeout=None)
