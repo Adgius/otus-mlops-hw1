@@ -325,7 +325,7 @@ services:
         - MLFLOW_S3_ENDPOINT_URL=https://storage.yandexcloud.net
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-    command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --default-artifact-root s3://mlflow-otus-test --no-serve-artifacts --host 0.0.0.0
+    command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --default-artifact-root s3a://mlflow-otus-test --no-serve-artifacts --host 0.0.0.0
 
 volumes:
   postgres-db-volume:
