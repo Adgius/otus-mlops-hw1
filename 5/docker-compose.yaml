@@ -311,7 +311,8 @@ services:
       POSTGRES_PASSWORD: "mlflow_pw"
     ports:
       - "5432:5432"
-
+    volumes:
+      - postgres-db-volume-mlflow:/var/lib/postgresql/data
   mlflow_server:
     restart: always
     build: ./mlflow
