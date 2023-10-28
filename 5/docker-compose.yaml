@@ -327,7 +327,7 @@ services:
         - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - MLFLOW_HTTP_REQUEST_TIMEOUT=120 
-    command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --default-artifact-root s3a://mlflow-otus-test  --host 0.0.0.0 -p 5000
+    command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --default-artifact-root s3://mlflow-otus-test  --host 0.0.0.0 -p 5000
 
 volumes:
   postgres-db-volume:
