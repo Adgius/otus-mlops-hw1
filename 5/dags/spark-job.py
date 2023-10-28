@@ -34,7 +34,8 @@ with DAG(
                 ssh_hook=ssh_hook,
                 local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar', '/opt/airflow/data/credentials'],
                 remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar', '/home/ubuntu/.aws/credentials'],
-                operation='put'
+                operation='put',
+                create_intermediate_dirs=True
             )
 
     ssh_task1 = SSHOperator(
