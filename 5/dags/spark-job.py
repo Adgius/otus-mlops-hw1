@@ -26,14 +26,14 @@ with DAG(
         start_date=datetime(2023, 9, 30),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
-        tags=['airflow-hw-4'],
+        tags=['airflow-hw-5'],
         ) as dag:
 
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
-                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
+                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar', '/opt/airflow/data/credentials'],
+                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar', '/home/ubuntu/.aws/credentials'],
                 operation='put'
             )
 
