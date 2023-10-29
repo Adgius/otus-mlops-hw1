@@ -1,4 +1,4 @@
 FROM python:3.10-slim-buster
 # Install python packages
 COPY requirements.txt .
-RUN pip install -r requirements.txt && mkdir -p /home/root/.aws
+RUN pip install -r requirements.txt && mkdir -p /root/.aws
