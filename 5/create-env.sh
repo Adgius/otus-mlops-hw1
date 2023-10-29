@@ -7,3 +7,5 @@ echo -e endpoint_url='https://storage.yandexcloud.net' >> $HOME/otus-mlops-hw1/5
 echo -e region_name = 'ru-central1' >> $HOME/otus-mlops-hw1/5/mlflow/credentials
 echo -e aws_access_key_id = $AWS_ACCESS_KEY_ID >> $HOME/otus-mlops-hw1/5/mlflow/credentials
 echo -e aws_secret_access_key = $AWS_SECRET_ACCESS_KEY >> $HOME/otus-mlops-hw1/5/mlflow/credentials
+
+cp -R $HOME/otus-mlops-hw1/5/mlflow/credentials $HOME/otus-mlops-hw1/5/.data/credentials
