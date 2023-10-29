@@ -328,7 +328,7 @@ services:
         - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
         - MLFLOW_HTTP_REQUEST_TIMEOUT=120 
     volumes:
-        - ${AIRFLOW_PROJ_DIR:-.}/.data:~/.aws/credentials
+        - ${AIRFLOW_PROJ_DIR:-.}/.data:/home/root/.aws/credentials
     command: mlflow server --backend-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --registry-store-uri postgresql://mlflow_user:mlflow_pw@postgres_mlflow:5432/mlflow_db --default-artifact-root s3://mlflow-otus-test  --host 0.0.0.0 -p 5000
 
 volumes:
