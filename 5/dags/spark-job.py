@@ -32,8 +32,8 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar', '/opt/airflow/data/credentials'],
-                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar', '/home/ubuntu/.aws/credentials'],
+                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
+                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
                 operation='put',
                 create_intermediate_dirs=True
             )
