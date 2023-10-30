@@ -92,6 +92,7 @@ def set_env(args):
     os.environ['AWS_DEFAULT_REGION'] = args.AWS_DEFAULT_REGION
     os.environ['AWS_ACCESS_KEY_ID'] = args.AWS_ACCESS_KEY_ID
     os.environ['AWS_SECRET_ACCESS_KEY'] = args.AWS_SECRET_ACCESS_KEY
+    os.environ['MLFLOW_ARTIFACT_URI'] = args.MLFLOW_ARTIFACT_URI
 
 def main(args):
 
