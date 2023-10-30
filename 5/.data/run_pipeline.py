@@ -94,7 +94,7 @@ def set_env(args):
     os.environ['AWS_SECRET_ACCESS_KEY'] = args.AWS_SECRET_ACCESS_KEY
 
 def main(args):
-    
+
     set_env(args)
 
     input_bucket = args.input_bucket
@@ -206,7 +206,8 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output_artifact", type=str, help="Name for the output serialized model (Inference Artifact folder)" ,required=True,)
     parser.add_argument('-u', '--mlflow_tracking_uri', type=str, help='mlflow_tracking_uri')
     parser.add_argument('-r', '--AWS_DEFAULT_REGION', type=str, help='AWS_DEFAULT_REGION')
-    parser.add_argument('-e', '--MLFLOW_S3_ENDPOINT_URL', type=str, help='MLFLOW_S3_ENDPOINT_URL')
+    parser.add_argument('-a', '--MLFLOW_ARTIFACT_URI', type=str, help='MLFLOW_ARTIFACT_URI')
+    parser.add_argument('-e', '--MLFLOW_S3_ENDPOINT_URL', type=str, default ='s3a://mlflow-otus-test', help='MLFLOW_S3_ENDPOINT_URL')
     parser.add_argument('-k', '--AWS_ACCESS_KEY_ID', type=str, help='S3 AWS_ACCESS_KEY_ID')
     parser.add_argument('-s', '--AWS_SECRET_ACCESS_KEY', type=str, help='S3 AWS_SECRET_ACCESS_KEY')
     args = parser.parse_args()
