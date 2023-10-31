@@ -98,12 +98,12 @@ def main(args):
 
     set_env(args)
 
-    print(os.environ['MLFLOW_S3_ENDPOINT_URL'])
-    print(os.environ['AWS_DEFAULT_REGION'])
-    print(os.environ['AWS_ACCESS_KEY_ID'])
-    print(os.environ['AWS_SECRET_ACCESS_KEY'])
-    print(os.environ['MLFLOW_ARTIFACT_URI'])
-    print(os.environ['PYSPARK_SUBMIT_ARGS'])
+    logger.info('MLFLOW_S3_ENDPOINT_URL', os.environ['MLFLOW_S3_ENDPOINT_URL'])
+    logger.info('AWS_DEFAULT_REGION', os.environ['AWS_DEFAULT_REGION'])
+    logger.info(os.environ['AWS_ACCESS_KEY_ID'])
+    logger.info(os.environ['AWS_SECRET_ACCESS_KEY'])
+    logger.info('MLFLOW_ARTIFACT_URI', os.environ['MLFLOW_ARTIFACT_URI'])
+    logger.info(os.environ['PYSPARK_SUBMIT_ARGS'])
     input_bucket = args.input_bucket
     output_artifact = args.output_artifact
     val_frac = args.val_frac
