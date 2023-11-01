@@ -142,7 +142,7 @@ def main(args):
         dfs = []
         for data in data_bucket.objects.all():
             dfs.append(sql.read.parquet('s3a://{}/{}'.format(input_bucket, data.key)).limit(100000))
-            break
+
         df = reduce(DataFrame.unionAll, dfs)
 
         logger.info("Getting new pipeline ...")
