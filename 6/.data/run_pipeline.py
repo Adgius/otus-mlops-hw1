@@ -236,7 +236,7 @@ def main(args):
         mlflow.log_metric('FNR_lower', np.percentile(fnr, 2.5))
         mlflow.log_metric('FNR_upper', np.percentile(fnr, 97.5))
 
-        if run_id > 0:
+        if int(run_id) > 0:
             FPR_upper_prev = client.get_metric_history(run_id, 'FPR_upper')
             FNR_upper_prev = client.get_metric_history(run_id, 'FNR_upper')
 
