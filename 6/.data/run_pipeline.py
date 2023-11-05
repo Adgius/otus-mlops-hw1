@@ -109,7 +109,7 @@ class FPR_metric(Evaluator):
         return True   
      
 def get_pipeline():
-    generator = FeatureGenerator(features=attributes)
+    generator = FeatureGenerator()
     imputer = Imputer(inputCols=features, outputCols=features)
     assembler = VectorAssembler(inputCols=features, outputCol='features')
     scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
