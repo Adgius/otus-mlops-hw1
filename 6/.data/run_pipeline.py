@@ -223,8 +223,8 @@ def main(args):
         fnr = []
         for _ in tqdm(range(50)):
             predictions = cv_model.transform(test.sample(fraction=1.0, withReplacement=True))
-            fpr.append(FPR_metric.evaluate(predictions))
-            fnr.append(FNR_metric.evaluate(predictions))
+            fpr.append(FPR_metric().evaluate(predictions))
+            fnr.append(FNR_metric().evaluate(predictions))
         logger.info(f'FPR: {np.mean(fpr)} CI:[{np.percentile(fpr, 2.5)}, {np.percentile(fpr, 97.5)}]')
         logger.info(f'FNR: {np.mean(fnr)} CI:[{np.percentile(fnr, 2.5)}, {np.percentile(fnr, 97.5)}]')
 
