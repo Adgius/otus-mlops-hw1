@@ -80,7 +80,7 @@ class FeatureGenerator(Transformer, MLReadable, MLWritable):
 
 class FNR_metric(Evaluator):
 
-    def __init__(self, predictionCol='prediction', labelCol='label'):
+    def __init__(self, predictionCol='prediction', labelCol='tx_fraud'):
         self.predictionCol = predictionCol
         self.labelCol = labelCol
 
@@ -95,7 +95,7 @@ class FNR_metric(Evaluator):
     
 class FPR_metric(Evaluator):
 
-    def __init__(self, predictionCol='prediction', labelCol='label'):
+    def __init__(self, predictionCol='prediction', labelCol='tx_fraud'):
         self.predictionCol = predictionCol
         self.labelCol = labelCol
 
