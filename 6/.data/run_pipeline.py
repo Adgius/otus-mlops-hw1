@@ -228,19 +228,19 @@ def main(args):
         logger.info(f'FPR: {np.mean(fpr)} CI:[{np.percentile(fpr, 2.5)}, {np.percentile(fpr, 97.5)}]')
         logger.info(f'FNR: {np.mean(fnr)} CI:[{np.percentile(fnr, 2.5)}, {np.percentile(fnr, 97.5)}]')
 
-        mlflow.log_param('FPR', np.mean(fpr))
-        mlflow.log_param('FPR_lower', np.percentile(fpr, 2.5))
-        mlflow.log_param('FPR_upper', np.percentile(fpr, 97.5))
+        mlflow.log_metric('FPR', np.mean(fpr))
+        mlflow.log_metric('FPR_lower', np.percentile(fpr, 2.5))
+        mlflow.log_metric('FPR_upper', np.percentile(fpr, 97.5))
 
-        mlflow.log_param('FNR', np.mean(fnr))
-        mlflow.log_param('FNR_lower', np.percentile(fnr, 2.5))
-        mlflow.log_param('FNR_upper', np.percentile(fnr, 97.5))
+        mlflow.log_metric('FNR', np.mean(fnr))
+        mlflow.log_metric('FNR_lower', np.percentile(fnr, 2.5))
+        mlflow.log_metric('FNR_upper', np.percentile(fnr, 97.5))
 
         if run_id > 0:
             FPR_upper_prev = client.get_metric_history(run_id, 'FPR_upper')
             FNR_upper_prev = client.get_metric_history(run_id, 'FNR_upper')
 
-            if FPR_upper_prev < np.percentile(fpr, 2.5) and FNR_upper_prev < np.percentile(fnr, 2.5):
+            if float(FPR_upper_prev) < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
                 logger.info("Saving best model ...")
                 mlflow.spark.save_model(cv_model.bestModel.stages[-1], output_artifact)
 
