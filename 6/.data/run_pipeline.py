@@ -237,8 +237,8 @@ def main(args):
         mlflow.log_metric('FNR_upper', np.percentile(fnr, 97.5))
 
         if int(run_id) > 0:
-            FPR_upper_prev = client.get_metric_history(run_id, 'FPR_upper')
-            FNR_upper_prev = client.get_metric_history(run_id, 'FNR_upper')
+            FPR_upper_prev = client.get_metric_history(run_id - 1, 'FPR_upper')
+            FNR_upper_prev = client.get_metric_history(run_id - 1, 'FNR_upper')
 
             if float(FPR_upper_prev) < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
                 logger.info("Saving best model ...")
