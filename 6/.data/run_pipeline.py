@@ -242,7 +242,7 @@ def main(args):
         logger.info("Exporting/logging model ...")
         mlflow.spark.log_model(cv_model.bestModel.stages[-1], output_artifact)
 
-        mlflow.log_metric('best_model', 'true')
+        mlflow.log_metric('best_model', 1)
         logger.info("Done")
 
         find_best_model = False
@@ -253,14 +253,14 @@ def main(args):
             # Check status
             if r['info'].get('status', None) == 'FINISHED':
                 # Check is it a best model
-                if r['data']['metrics']['best_model'] == 'true':
+                if r['data']['metrics']['best_model'] == 1:
                     FPR_upper_prev = r['data']['metrics']['FPR_upper']
                     FNR_upper_prev = r['data']['metrics']['FNR_upper']
                     if FPR_upper_prev < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
                         logger.info('New best model ...')
                         find_best_model = True
                         # Set new best model
-                        mlflow.log_metric('best_model', 'true')
+                        mlflow.log_metric('best_model', 1)
                         # Delete previous best model status
                         client.log_metric(r['info']['run_id'], 'best_model', 'false')
                         break
@@ -271,7 +271,7 @@ def main(args):
         
         # if it is a first finished run
         if not find_best_model:
-            mlflow.log_metric('best_model', 'true')
+            mlflow.log_metric('best_model', 1)
 
 if __name__ == "__main__":
 
