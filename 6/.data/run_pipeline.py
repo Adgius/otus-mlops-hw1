@@ -257,6 +257,7 @@ def main(args):
                     FPR_upper_prev = r['data']['metrics']['FPR_upper']
                     FNR_upper_prev = r['data']['metrics']['FNR_upper']
                     if FPR_upper_prev < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
+                        logger.info('New best model ...')
                         find_best_model = True
                         # Set new best model
                         mlflow.log_metric('best_model', 'true')
@@ -264,6 +265,7 @@ def main(args):
                         client.log_metric(r['info']['run_id'], 'best_model', 'false')
                         break
                     else:
+                        logger.info('Its not a best model ...')
                         mlflow.log_metric('best_model', 'false')
                         break
         
