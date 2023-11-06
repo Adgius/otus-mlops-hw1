@@ -113,7 +113,7 @@ def get_pipeline():
     imputer = Imputer(inputCols=features, outputCols=features)
     assembler = VectorAssembler(inputCols=features, outputCol='features')
     # scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
-    lr = LogisticRegression(featuresCol=features, labelCol='tx_fraud')
+    lr = LogisticRegression(featuresCol='features', labelCol='tx_fraud')
     pipeline = Pipeline(stages=[generator, imputer, assembler, lr])
     return pipeline
 
