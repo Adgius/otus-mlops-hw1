@@ -114,7 +114,7 @@ def get_pipeline():
     assembler = VectorAssembler(inputCols=features, outputCol='features')
     # scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
     lr = LogisticRegression(featuresCol='features_scaled', labelCol='tx_fraud')
-    pipeline = Pipeline(stages=[generator, imputer, assembler, scaler, lr])
+    pipeline = Pipeline(stages=[generator, imputer, assembler, lr])
     return pipeline
 
 def set_env(args):
