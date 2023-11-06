@@ -236,26 +236,40 @@ def main(args):
         mlflow.log_metric('FNR_lower', np.percentile(fnr, 2.5))
         mlflow.log_metric('FNR_upper', np.percentile(fnr, 97.5))
 
-        if int(run_id) > 0:
-            FPR_upper_prev = client.get_metric_history(run_id - 1, 'FPR_upper')
-            FNR_upper_prev = client.get_metric_history(run_id - 1, 'FNR_upper')
+        logger.info("Saving model ...")
+        mlflow.spark.save_model(cv_model.bestModel.stages[-1], output_artifact)
 
-            if float(FPR_upper_prev) < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
-                logger.info("Saving best model ...")
-                mlflow.spark.save_model(cv_model.bestModel.stages[-1], output_artifact)
+        logger.info("Exporting/logging model ...")
+        mlflow.spark.log_model(cv_model.bestModel.stages[-1], output_artifact)
 
-                logger.info("Exporting/logging best model ...")
-                mlflow.spark.log_model(cv_model.bestModel.stages[-1], output_artifact)
-                logger.info("Done")
-            else:
-                logger.info("Nothing to save. The current model is worse  ...")
-        else:
-            logger.info("Saving model ...")
-            mlflow.spark.save_model(cv_model.bestModel.stages[-1], output_artifact)
+        mlflow.log_metric('best_model', 'true')
+        logger.info("Done")
 
-            logger.info("Exporting/logging model ...")
-            mlflow.spark.log_model(cv_model.bestModel.stages[-1], output_artifact)
-            logger.info("Done")
+        find_best_model = False
+
+        logger.info('Looking for a best model ...')
+        for r in client.search_runs(experiment_id):
+            r = r.to_dictionary()
+            # Check status
+            if r['info'].get('status', None) == 'FINISHED':
+                # Check is it a best model
+                if r['data']['metrics']['best_model'] == 'true':
+                    FPR_upper_prev = r['data']['metrics']['FPR_upper']
+                    FNR_upper_prev = r['data']['metrics']['FNR_upper']
+                    if FPR_upper_prev < np.percentile(fpr, 2.5) and float(FNR_upper_prev) < np.percentile(fnr, 2.5):
+                        find_best_model = True
+                        # Set new best model
+                        mlflow.log_metric('best_model', 'true')
+                        # Delete previous best model status
+                        client.log_metric(r['info']['run_id'], 'best_model', 'false')
+                        break
+                    else:
+                        mlflow.log_metric('best_model', 'false')
+                        break
+        
+        # if it is a first finished run
+        if not find_best_model:
+            mlflow.log_metric('best_model', 'true')
 
 if __name__ == "__main__":
 
