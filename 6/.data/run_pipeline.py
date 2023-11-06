@@ -262,11 +262,11 @@ def main(args):
                         # Set new best model
                         mlflow.log_metric('best_model', 1)
                         # Delete previous best model status
-                        client.log_metric(r['info']['run_id'], 'best_model', 'false')
+                        client.log_metric(r['info']['run_id'], 'best_model', 0)
                         break
                     else:
                         logger.info('Its not a best model ...')
-                        mlflow.log_metric('best_model', 'false')
+                        mlflow.log_metric('best_model', 0)
                         break
         
         # if it is a first finished run
