@@ -2,6 +2,7 @@ version: '3'
 services:
   zookeeper:
     image: wurstmeister/zookeeper
+    container_name: zookeeper
     ports:
       - "2181:2181"
     restart: unless-stopped
