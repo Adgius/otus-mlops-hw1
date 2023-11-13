@@ -1,9 +1,9 @@
 FROM postgres:latest
 
 # Set environment variables for Postgres
-ENV POSTGRES_USER=myuser
-ENV POSTGRES_PASSWORD=mypassword
-ENV POSTGRES_DB=mydb
+ARG POSTGRES_USER
+ARG POSTGRES_PASSWORD
+ARG POSTGRES_DB
 
 # Install the build dependencies
 USER root

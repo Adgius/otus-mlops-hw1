@@ -2,13 +2,14 @@ version: "3"
 
 services:
   postgres:
-    build: ./pgvector
+    build: 
+      context: ./pgvector
+      args:
+        POSTGRES_USER: "myuser"
+        POSTGRES_PASSWORD: "mypassword"
+        POSTGRES_DB: "mydb"
     ports:
       - "5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data
       - ./pgvector/init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
