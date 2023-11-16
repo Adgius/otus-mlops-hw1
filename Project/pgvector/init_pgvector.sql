@@ -12,4 +12,10 @@ semantic search, just storing here the vectorized content in our "items" table.
 number of dimensions our transformer embeddings model output.
 */
 
-CREATE TABLE items (id serial PRIMARY KEY, content TEXT, embedding vector(768));
+CREATE TABLE reviews (id serial PRIMARY KEY,  
+		      	content TEXT, 
+			score INTEGER, 
+			at DATETIME, 
+			country TEXT,
+			source TEXT,
+			embedding vector(768));
