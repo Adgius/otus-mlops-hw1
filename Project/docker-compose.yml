@@ -39,11 +39,11 @@ services:
     container_name: jupyter_notebook
     environment:
       JUPYTER_ENABLE_LAB: "yes"
-      PASSWORD: ${JUPYTER_PASSWORD}
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN}
     ports:
       - "8888:8888"
     volumes:
-      - ${PWD}:/home/jovyan/work
+      - ${PWD}/jupyter:/home/jovyan/work
     depends_on:
       - database
 
