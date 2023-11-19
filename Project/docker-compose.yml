@@ -30,9 +30,9 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./airflow/dags:./airflow/dags
-      - ./airflow/logs:./airflow/logs
-      - ./airflow/plugins:./airflow/plugins
+      - ${PWD}/airflow/dags:/opt/airflow/dags
+      - ${PWD}/airflow/logs:/opt/airflow/logs
+      - ${PWD}/airflow/plugins:/opt/airflow/plugins
 
   jupyter_notebook:
     image: jupyter/scipy-notebook
