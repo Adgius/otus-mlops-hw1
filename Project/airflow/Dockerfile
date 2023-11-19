@@ -1,9 +1,10 @@
 FROM python:3.9.0
 
-RUN mkdir /airflow 
-ENV AIRFLOW_HOME=~/airflow
+RUN mkdir /opt/airflow/
+ENV AIRFLOW_HOME=/opt/airflow/
 
 COPY requirements.txt requirements.txt
+COPY start_airflow.sh /opt/airflow/start_airflow_db.sh
 
 RUN apt-get update -y \
  && apt-get upgrade -y \
@@ -13,14 +14,6 @@ RUN pip install -U pip \
  && pip install -U setuptools\ 
  && pip install -r requirements.txt 
 
-RUN airflow db init \
- && airflow db upgrade \
- && airflow users create \
-   --username admin \
-   --firstname Airflow \
-   --lastname Administrator \
-   --role Admin \
-   --email admin@example.org \
-   --password 12345 \
- && airflow scheduler \
- && airflow webserver
+RUN chmod +x /opt/airflow/start_airflow_db.sh
+
+ENTRYPOINT ["/opt/airflow/start_airflow_db.sh"]
