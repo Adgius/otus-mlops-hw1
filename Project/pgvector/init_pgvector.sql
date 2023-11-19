@@ -2,6 +2,7 @@
 
 CREATE EXTENSION IF NOT EXISTS vector;
 
+CREATE ROLE postgres WITH LOGIN CREATEDB;
 /*
 For simplicity, we are directly adding the content into this table as
 a column containing text data. It could easily be a foreign key pointing to
