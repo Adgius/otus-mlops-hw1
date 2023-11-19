@@ -15,7 +15,8 @@ number of dimensions our transformer embeddings model output.
 CREATE TABLE reviews (id serial PRIMARY KEY,  
 		      	content TEXT, 
 			score INTEGER, 
-			at DATETIME, 
+			created_time TIMESTAMP, 
 			country TEXT,
 			source TEXT,
+			is_negative BOOLEAN,
 			embedding vector(768));
