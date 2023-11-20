@@ -24,6 +24,9 @@ services:
   airflow:
     build: ./airflow
     container_name: airflow
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@ariflow_postgres:5432/airflow
     restart: always
     depends_on:
       - ariflow_postgres
@@ -32,7 +35,7 @@ services:
     volumes:
       - ${PWD}/airflow/dags:/opt/airflow/dags
       - ${PWD}/airflow/logs:/opt/airflow/logs
-      - ${PWD}/airflow/plugins:/opt/airflow/plugins
+      - ${PWD}/airflow/plugins:/opt/airflow/plugins 
 
   jupyter_notebook:
     image: jupyter/scipy-notebook
