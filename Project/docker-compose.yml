@@ -20,6 +20,8 @@ services:
         ]
       interval: 5s
       retries: 5
+    networks:
+      airflow
 
   airflow:
     build: ./airflow
@@ -36,6 +38,8 @@ services:
       - ${PWD}/airflow/dags:/opt/airflow/dags
       - ${PWD}/airflow/logs:/opt/airflow/logs
       - ${PWD}/airflow/plugins:/opt/airflow/plugins 
+    networks:
+      airflow
 
   jupyter_notebook:
     image: jupyter/scipy-notebook
