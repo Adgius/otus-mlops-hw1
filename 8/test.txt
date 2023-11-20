@@ -1,0 +1,16 @@
+minikube start --vm-driver=docker
+kubectl get namespaces
+kubectl create namespace ingress-nginx
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+kubectl create deployment demo --image=httpd --port=80
+kubectl expose deployment demo
+kubectl create ingress demo-localhost --class=nginx --rule="demo.localdev.me/*=demo:80"
+
+
+kubectl get componentstatuses
+kubectl cluster-info
+kubectl get nodes
+minikube stop
+minikube delete
+minikube ssh
