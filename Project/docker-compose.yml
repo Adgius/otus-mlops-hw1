@@ -1,9 +1,5 @@
 version: '3'
-networks:
-  name: airflow
-  airflow:
-    driver: bridge
-    
+
 services:
   ariflow_postgres:
     image: postgres 
@@ -85,3 +81,7 @@ services:
     volumes:
       - ./pgvector/init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
 
+networks:
+  name: airflow
+  airflow:
+    driver: bridge
