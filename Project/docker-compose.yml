@@ -1,4 +1,9 @@
 version: '3'
+networks:
+  name: airflow
+  airflow:
+    driver: bridge
+    
 services:
   ariflow_postgres:
     image: postgres 
