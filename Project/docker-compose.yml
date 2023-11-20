@@ -43,13 +43,14 @@ services:
   jupyter_notebook:
     image: jupyter/scipy-notebook
     container_name: jupyter_notebook
+    command: sudo chown -R jovyan /home/jovyan
     environment:
       JUPYTER_ENABLE_LAB: "yes"
       JUPYTER_TOKEN: ${JUPYTER_TOKEN}
     ports:
       - "8888:8888"
     volumes:
-      - ${PWD}/jupyter:/home/jovyan
+      - ${PWD}/jupyter:/home/jovyan/work
     depends_on:
       - database
 
