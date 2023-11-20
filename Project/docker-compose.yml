@@ -8,6 +8,8 @@ services:
       - POSTGRES_USER=${POSTGRES_AIRFLOW_USER}
       - POSTGRES_DB=airflow
     restart: always
+    expose:
+    - "5432"
     healthcheck:
       test:
         [
