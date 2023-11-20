@@ -43,7 +43,7 @@ services:
   jupyter_notebook:
     image: jupyter/scipy-notebook
     container_name: jupyter_notebook
-    command: sudo chown -R jovyan /home/jovyan
+    command: sudo chown -R jovyan:users /home/jovyan/*
     environment:
       JUPYTER_ENABLE_LAB: "yes"
       JUPYTER_TOKEN: ${JUPYTER_TOKEN}
