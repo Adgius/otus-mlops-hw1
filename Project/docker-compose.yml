@@ -29,8 +29,9 @@ services:
     container_name: airflow
     environment:
       - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS=false
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@ariflow_postgres:5432/airflow
-      - AIRFLOW_CONN_POSTGRES=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mydb:5432/postgres
+      - AIRFLOW_CONN_REVIEWS_DB=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mydb:5432/public
     restart: always
     depends_on:
       - ariflow_postgres
