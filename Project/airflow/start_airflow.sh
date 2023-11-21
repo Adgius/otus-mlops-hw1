@@ -11,7 +11,6 @@ airflow users create \
    --email admin@example.org \
    --password 12345
 
-airflow connections add 'postgres' \
-    --conn-uri 'postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mydb:5432/public'
+airflow connections add 'postgres' ${AIRFLOW_CONN_REVIEWS_DB}
 
 airflow scheduler & airflow webserver
