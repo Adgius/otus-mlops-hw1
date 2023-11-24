@@ -18,6 +18,15 @@ CREATE TABLE reviews (id serial PRIMARY KEY,
 			score INTEGER, 
 			created_time TIMESTAMP, 
 			country TEXT,
-			source TEXT,
-			is_negative BOOLEAN,
-			embedding vector(768));
+			source CHARACTER(10),
+			sentiment CHARACTER(10),
+			embeddings vector(100));
+
+CREATE TABLE rating (score FLOAT,
+					 source CHARACTER(10),
+					 dates DATE,
+					 count INTEGER
+);
+
+COPY reviews FROM '$HOME/init_data/reviews.csv' WITH (FORMAT csv);
+COPY rating FROM '$HOME/init_data/rating.csv' WITH (FORMAT csv);

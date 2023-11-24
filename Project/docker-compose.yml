@@ -78,3 +78,4 @@ services:
       retries: 5
     volumes:
       - ./pgvector/init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
+      - ./pgvector/init_data:/init_data
