@@ -28,5 +28,5 @@ CREATE TABLE rating (score FLOAT,
 					 count INTEGER
 );
 
-COPY reviews FROM '$HOME/init_data/reviews.csv' WITH (FORMAT csv);
-COPY rating FROM '$HOME/init_data/rating.csv' WITH (FORMAT csv);
+-- COPY reviews FROM '${HOME}/init_data/reviews.csv' WITH (FORMAT csv);
+-- COPY rating FROM '${HOME}/init_data/rating.csv' WITH (FORMAT csv);
