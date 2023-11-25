@@ -28,5 +28,5 @@ CREATE TABLE rating (score FLOAT,
 					 count INTEGER
 );
 
-COPY reviews FROM '/init_data/reviews.csv' DELIMITER '|' CSV HEADER;
-COPY rating FROM '/init_data/rating.csv' DELIMITER ',' CSV HEADER;
+COPY reviews(content, score, created_time, country, source, sentiment, embeddings) FROM '/init_data/reviews.csv' DELIMITER '|' CSV;
+COPY rating FROM '/init_data/rating.csv' DELIMITER ',' CSV;
