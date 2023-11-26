@@ -121,7 +121,7 @@ def add_embedding(df):
     os.remove('train.txt')
 
 def run(**kwargs):
-    date = dt.datetime.strptime(kwargs['ds'], "%Y-%m-%d").date() - dt.timedelta(2)
+    date = (dt.datetime.strptime(kwargs['ds'], "%Y-%m-%d") - dt.timedelta(2)).date()
     print(date)
     df = scrap(date)
     df = add_sentiment(df)
