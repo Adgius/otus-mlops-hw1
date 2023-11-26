@@ -11,13 +11,14 @@ from src.pipeline.reviews import run
 with DAG(
     dag_id='update_data',
     schedule_interval='@once',
-    start_date=datetime(2023, 11, 26),
+    start_date=datetime(2023, 11, 25),
     catchup=False,
     dagrun_timeout=timedelta(minutes=120)
 ) as dag:
     update_reviews = PythonOperator(
         task_id='get_reviews',
-        python_callable=run
+        python_callable=run,
+        provide_context=True
     )
 
     update_reviews
