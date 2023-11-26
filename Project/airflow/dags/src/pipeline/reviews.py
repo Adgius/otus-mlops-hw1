@@ -110,7 +110,7 @@ def add_sentiment(df):
 def add_embedding(df):    
     stopwords = requests.get('https://raw.githubusercontent.com/negapedia/nltk/master/corpora/stopwords/russian').content.decode('utf-8').split('\n')
     text = load_from_pg(pg_hook, 'collect_content')
-    text = text.str.lower().str.replace(r'[^\w]', ' ', regex=True).str.replace(r'\s{2,}', ' ', regex=True)
+    text = text['content'].str.lower().str.replace(r'[^\w]', ' ', regex=True).str.replace(r'\s{2,}', ' ', regex=True)
     text = text.apply(lambda x: ' '.join([w  for w in x.split() if w not in stopwords]))
     with open('train.txt', 'w') as txt:
         txt.writelines(text)
