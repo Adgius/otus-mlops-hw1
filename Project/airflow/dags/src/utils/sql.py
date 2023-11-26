@@ -1,12 +1,10 @@
 import pandas as pd
-import sys
 import os
 from sqlalchemy import create_engine
 
 def read_sql(name):
-    print(os.path.dirname(os.path.abspath(sys.argv[0]))) #
     try:
-        with open(f'/sql/{name}.sql') as s:
+        with open(os.path.join(os.getnenv('AIRFLOW_HOME'), 'dags', 'sql', f'{name}.sql')) as s:
             sql = s.readlines()
             print('SQL', sql)
             return sql
