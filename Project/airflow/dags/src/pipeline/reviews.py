@@ -87,7 +87,7 @@ def rating():
 
     df3 = pd.Series({'score': find_score(app_res), 'ratings': sum(app_res.values()), 'source': 'AppStore'})
     res = pd.concat([df2, df3], axis=1).T
-    res['dates'] = pd.to_datetime(date.today())
+    res['dates'] = pd.to_datetime(date.date())
     return res
 
 def predict(tokenizer, model, text):
