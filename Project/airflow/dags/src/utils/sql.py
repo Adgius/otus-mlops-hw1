@@ -5,6 +5,7 @@ def read_sql(name):
     try:
         with open(f'sql/{name}.sql') as s:
             sql = s.readlines()
+            return sql
     except FileNotFoundError:
         print('There is no script with that name')
 
