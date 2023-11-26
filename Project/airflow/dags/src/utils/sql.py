@@ -4,9 +4,9 @@ from sqlalchemy import create_engine
 
 def read_sql(name):
     print(os.getcwd())
-    print(os.listdir('sql'))
+    print(os.listdir('/sql'))
     try:
-        with open(f'sql/{name}.sql') as s:
+        with open(f'/sql/{name}.sql') as s:
             sql = s.readlines()
             print('SQL', sql)
             return sql
