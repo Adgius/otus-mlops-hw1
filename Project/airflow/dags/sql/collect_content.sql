@@ -1,1 +1,1 @@
-select content from reviews
+select content from public.reviews
