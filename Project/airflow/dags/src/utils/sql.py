@@ -5,15 +5,14 @@ def read_sql(name):
     try:
         with open(f'sql/{name}.sql') as s:
             sql = s.readlines()
+            print('SQL', sql)
             return sql
     except FileNotFoundError:
         print('There is no script with that name')
 
 def load_from_pg(pg_hook, request_name):
     sql = read_sql(request_name)
-    print('URI', pg_hook.get_uri())
     connection = pg_hook.get_conn()
-    print('URI', connection)
     cursor = connection.cursor()
     cursor.execute(sql)
     colnames = [desc[0] for desc in cursor.description]
