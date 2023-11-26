@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 def read_sql(name):
     print(os.getcwd())
-    print(os.listdir('/sql'))
+    print(os.listdir())
     try:
         with open(f'/sql/{name}.sql') as s:
             sql = s.readlines()
