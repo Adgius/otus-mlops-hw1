@@ -12,7 +12,8 @@ RUN apt-get update -y \
 
 RUN pip install -U pip \
  && pip install -U setuptools\ 
- && pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt 
+ && pip install -r requirements.txt \
+ && pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 RUN chmod +x /opt/airflow/start_airflow_db.sh
 
