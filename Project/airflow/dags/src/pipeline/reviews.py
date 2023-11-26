@@ -106,14 +106,6 @@ def add_sentiment(df):
 
     return df
 
-def load_from_pg(pg_hook, request_name):
-    sql = read_sql(request_name)
-    connection = pg_hook.get_conn()
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    colnames = [desc[0] for desc in cursor.description]
-    records = cursor.fetchall()
-    result = pd.DataFrame(records, columns=colnames)
 
 def add_embedding(df):    
     stopwords = requests.get('https://raw.githubusercontent.com/negapedia/nltk/master/corpora/stopwords/russian').content.decode('utf-8').split('\n')
@@ -127,3 +119,8 @@ def add_embedding(df):
     df['embeddings'] = df['embeddings'].apply(lambda x: x.tolist())
     save_to_pg(pg_hook, df, 'reviews')
     os.remove('train.txt')
+
+def run(date):
+    df = scrap(date)
+    df = add_sentiment(df)
+    add_embedding(df)
