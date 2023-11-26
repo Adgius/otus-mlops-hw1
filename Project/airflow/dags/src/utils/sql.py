@@ -10,6 +10,7 @@ def read_sql(name):
 
 def load_from_pg(pg_hook, request_name):
     sql = read_sql(request_name)
+    print('URI', pg_hook.get_uri())
     connection = pg_hook.get_conn()
     print('URI', connection)
     cursor = connection.cursor()
