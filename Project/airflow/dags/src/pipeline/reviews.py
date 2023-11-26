@@ -120,7 +120,8 @@ def add_embedding(df):
     save_to_pg(pg_hook, df, 'reviews')
     os.remove('train.txt')
 
-def run(date):
+def run(**kwargs):
+    date = dt.datetime.strptime(kwargs['ds'], "%Y-%m-%d").date()
     df = scrap(date)
     df = add_sentiment(df)
     add_embedding(df)
