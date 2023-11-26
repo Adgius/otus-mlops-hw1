@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 def read_sql(name):
     try:
-        with open(os.path.join(os.getnenv('AIRFLOW_HOME'), 'dags', 'sql', f'{name}.sql')) as s:
+        with open(os.path.join(os.getenv('AIRFLOW_HOME'), 'dags', 'sql', f'{name}.sql')) as s:
             sql = s.readlines()
             print('SQL', sql)
             return sql
