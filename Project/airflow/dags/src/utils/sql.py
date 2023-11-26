@@ -1,10 +1,10 @@
 import pandas as pd
+import sys
 import os
 from sqlalchemy import create_engine
 
 def read_sql(name):
-    print(os.getcwd())
-    print(os.listdir())
+    print(os.path.dirname(os.path.abspath(sys.argv[0]))) #
     try:
         with open(f'/sql/{name}.sql') as s:
             sql = s.readlines()
