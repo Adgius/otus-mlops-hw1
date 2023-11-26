@@ -12,7 +12,7 @@ RUN apt-get update -y \
 
 RUN pip install -U pip \
  && pip install -U setuptools\ 
- && pip install -r requirements.txt 
+ && pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt 
 
 RUN chmod +x /opt/airflow/start_airflow_db.sh
 
