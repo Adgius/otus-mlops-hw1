@@ -24,4 +24,4 @@ def load_from_pg(pg_hook, request_name):
 
 def save_to_pg(pg_hook, df, destination):
     engine = create_engine(pg_hook.get_uri())
-    df.to_sql(destination, engine, if_exists='append')
+    df.to_sql(destination, engine, if_exists='append', index=False)
