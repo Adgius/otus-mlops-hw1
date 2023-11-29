@@ -27,7 +27,7 @@ with DAG(
         provide_context=True
     )
 
-    update_rating > update_reviews
+    update_rating >> update_reviews
 
 
 if __name__ == "__main__":
