@@ -6,7 +6,6 @@ import requests
 import os
 
 from google_play_scraper import Sort, reviews
-from datetime import timedelta, datetime
 from itunes_app_scraper.scraper import AppStoreScraper
 from app_store_scraper import AppStore
 
@@ -67,29 +66,6 @@ def scrap(date, n=3000):
     result.rename(columns={'at': 'created_time'}, inplace=True)
     return result.drop_duplicates('content')
 
-def rating():
-    result = app(
-        'goldapple.ru.goldapple.customers',
-        lang='ru', 
-        country='ru' 
-
-        )
-    df2 = pd.Series({'score': result['score'], 'ratings': result['ratings'], 'source': 'GooglePlay'})
-
-    def find_score(app_res):
-        score = 0
-        for s in app_res:
-            score += app_res[s] * s
-        return score / sum(app_res.values())
-
-    scraper = AppStoreScraper()
-    app_res = scraper.get_app_ratings(1154436683, countries='ru')#['trackCensoredName']
-
-    df3 = pd.Series({'score': find_score(app_res), 'ratings': sum(app_res.values()), 'source': 'AppStore'})
-    res = pd.concat([df2, df3], axis=1).T
-    res['dates'] = pd.to_datetime(date.date())
-    return res
-
 def predict(tokenizer, model, text):
     inputs = tokenizer(text, max_length=512, padding=True, truncation=True, return_tensors='pt')
     outputs = model(**inputs)
@@ -120,9 +96,9 @@ def add_embedding(df):
     save_to_pg(pg_hook, df, 'reviews')
     os.remove('train.txt')
 
-def run(**kwargs):
+def run_reviews(**kwargs):
     date = dt.datetime.strptime(kwargs['ds'], "%Y-%m-%d") - dt.timedelta(2)
-    print(date)
+    print('reviews date', date)
     df = scrap(date)
     df = add_sentiment(df)
     add_embedding(df)
