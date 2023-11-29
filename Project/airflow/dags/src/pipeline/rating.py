@@ -27,10 +27,10 @@ def rating(date):
     scraper = AppStoreScraper()
     app_res = scraper.get_app_ratings(1154436683, countries='ru')#['trackCensoredName']
 
-    df3 = pd.Series({'score': find_score(app_res), 'ratings': sum(app_res.values()), 'source': 'AppStore'})
+    df3 = pd.Series({'score': find_score(app_res), 'count': sum(app_res.values()), 'source': 'AppStore'})
     res = pd.concat([df2, df3], axis=1).T
     res['dates'] = pd.to_datetime(date)
-    return res[['score', 'source', 'dates', 'ratings']]
+    return res[['score', 'source', 'dates', 'count']]
 
 
 def run_rating(**kwargs):
