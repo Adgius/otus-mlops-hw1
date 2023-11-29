@@ -16,7 +16,7 @@ def rating(date):
         country='ru' # defaults to 'us'
 
         )
-    df2 = pd.Series({'score': result['score'], 'ratings': result['ratings'], 'source': 'GooglePlay'})
+    df2 = pd.Series({'score': result['score'], 'count': result['ratings'], 'source': 'GooglePlay'})
 
     def find_score(app_res):
         score = 0
