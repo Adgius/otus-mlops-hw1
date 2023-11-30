@@ -1,0 +1,190 @@
+	<div class="left">
+		<div class="avg_score">
+			<div class="avg_score_title">	
+				<span class="material-icons-sharp">score</span>
+				<h2>Средняя оценка</h2>
+			</div>
+			<div class="avg_score_g">
+				<canvas id="avg_score"></canvas>
+			</div>
+			<p>{{ avg_score | safe}}</p>
+			<div class="change">
+				{% if avg_score_change_sign == '+' %}
+				<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+				<p style="color: var(--color-success);">{{ avg_score_change | safe}}</p>
+			    {% elif avg_score_change_sign == '-' %}
+				<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+				<p style="color: var(--color-danger)">-{{ avg_score_change | safe}}</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="neg_score">
+			<div class="neg_score_title">
+				<span class="material-icons-sharp">data_usage</span>
+				<h2>Процент негативных</h2>
+			</div>
+			<div class="neg_score_graph">
+				<canvas id="neg_score"></canvas>
+			</div>
+			<p>{{ neg_score | safe}}%</p>
+			<div class="change">
+				{% if neg_score_change_sign == '+' %}
+				<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+				<p style="color: var(--color-success);">{{ neg_score_change | safe}}</p>
+			    {% elif neg_score_change_sign == '-' %}
+				<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+				<p style="color: var(--color-danger)">-{{ neg_score_change | safe}}</p>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="right">
+		<div class="rating_total">
+			<canvas id="rating_total"></canvas>						
+		</div>
+		<div class="neg_total">
+			<canvas id="neg_total"></canvas>
+		</div>
+	</div>
+	<script>
+
+		/*_____________________AVG_SCORE_BAR___________________*/
+
+		const avg_score = document.getElementById('avg_score');
+		const avg_score_setup = {
+			labels: '1',
+			datasets: [
+				{
+					label: '1',
+					data: [{{ avg_score_count_1 | safe}}],
+					backgroundColor: 'rgba(220, 20, 60, 0.7)',
+					borderRadius: [
+						{topLeft: 1000, topRight: 0, bottomLeft: 1000, bottomRight: 0},
+					],
+					borderSkipped: false,
+				},
+				{
+					label: '2',
+					data: [{{ avg_score_count_2 | safe}}],
+					backgroundColor: 'rgba(219, 93, 21, 0.7)',
+				},
+				{
+					label: '3',
+					data: [{{ avg_score_count_3 | safe}}],
+					backgroundColor: 'rgba(219, 207, 21, 0.7)',
+				},
+				{
+					label: '4',
+					data: [{{ avg_score_count_4 | safe}}],
+					backgroundColor: 'rgba(117, 219, 21, 0.7)',
+				},
+				{
+					label: '5',
+					data: [{{ avg_score_count_5 | safe}}],
+					backgroundColor: 'rgba(50, 205, 50, 0.7)',
+					borderRadius: 1000,
+				},
+			]
+		}
+		new Chart(avg_score, {
+		type: 'bar',
+		data: avg_score_setup,
+		options: {
+			plugins: {
+			legend: {display: false}
+			},
+			indexAxis: 'y',
+			responsive: true,
+			maintainAspectRatio: false,
+			scales: {
+			x: {stacked: true,
+				display: false},
+			y: {stacked: true,
+				display: false},
+			},
+		}
+		}
+		);
+		/*_____________________SUMMARY_SCORE____________________*/
+
+		const rating_total = document.getElementById('rating_total');
+		const Summary_rating_setup = {
+			labels: {{ x | safe}},
+			datasets: [
+			{
+				label: 'Summary rating',
+				data: {{ rating_total_y | safe}}
+			}
+			]
+		}
+		new Chart(rating_total, {
+			type: 'line',
+			data: Summary_rating_setup,
+			options: {
+			responsive: true,
+		maintainAspectRatio: false,
+			},
+		});
+
+
+		/*_____________________NEGATIVE_SCORE____________________*/
+
+		const neg_total = document.getElementById('neg_total');
+		const neg_total_setup = {
+		labels: {{ x | safe}},
+		datasets: [
+			{
+			label: 'Positive',
+			data: {{ neg_total_y | safe}},
+			borderColor: 'rgba(87, 252, 86, 0.9)',
+			backgroundColor: 'rgba(87, 252, 86, 0.5)',
+			fill: true
+			},
+			{
+			label: 'Negative',
+			data: Array({{ x | safe}}.length).fill(5),
+			borderColor: 'rgba(252, 76, 76, 0.9)',
+			backgroundColor: 'rgba(252, 76, 76, 0.5)',
+			fill: '-1',
+			pointRadius: 0,
+			}
+		]
+		}
+
+		new Chart(neg_total, {
+		type: 'line',
+		data: neg_total_setup,
+		options: {
+		responsive: true,
+		maintainAspectRatio: false,
+		},
+		});
+
+
+		/*_____________________NEGATIVE_PIE___________________*/
+
+		const neg_score = document.getElementById('neg_score');
+		const neg_score_setup = {
+			labels: ['Positive', 'Negative'],
+			datasets: [
+			{
+				label: 'Summary rating',
+				data: [ 100 - {{neg_score | safe}}, {{neg_score | safe}}],
+			backgroundColor: [
+				'rgba(50, 205, 50, 0.7)',
+				'rgba(220, 20, 60, 0.7)']
+			}
+			]
+		}
+		new Chart(neg_score, {
+			type: 'doughnut',
+			data: neg_score_setup,
+			options: {
+			plugins: {
+			legend: {display: false}
+			},
+			responsive: true,
+			maintainAspectRatio: false,
+			},
+		});
+	</script>

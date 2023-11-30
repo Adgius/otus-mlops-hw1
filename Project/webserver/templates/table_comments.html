@@ -1,0 +1,189 @@
+<div id="search-form">
+	<div>
+		<textarea placeholder="Ваш запрос"></textarea>
+		<a href="#"><span id="help-query-confirm" class="material-icons-sharp">search</span></a>
+	</div>
+	<p id="help-query"><a href="#">Как пользоваться?</a></p>
+
+</div>
+<div class="table-container">
+	<table id="main-table-comments">
+	    <thead>
+	        <tr>
+	            <th>Текст комментария</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	    	{% for index, comment in comments.items() %}
+		    	<tr>
+		            <td index={{index}}>{{comment}}</td>
+		            <td><span class="material-icons-sharp">auto_fix_normal</span></td>
+		        </tr>
+	    	{% endfor %}
+	    	<tr>
+	            <td><a id="show_more_comments" href="#">Загрузить больше</a></td>
+	            <td></td>
+	        </tr>
+	    </tbody>
+	</table>
+</div>
+<div class="source-info">
+	<div class="info-container">
+		<div class="info-container-text">
+			<div class="info-container-name">Google Play</div>
+			<div class="info-container-score">46 из 156</div>
+		</div>
+		<canvas id="info-canvas-GP"></canvas>
+	</div>
+	<div class="info-container">
+		<div class="info-container-text">
+			<div class="info-container-name">AppStore</div>
+			<div class="info-container-score">32 из 141</div>
+		</div>
+		<canvas id="info-canvas-AS"></canvas>
+	</div>
+	<div class="info-container">
+		<div class="info-container-text">
+			<div class="info-container-name">NPS</div>
+			<div class="info-container-score">124 из 3025</div>
+		</div>
+		<canvas id="info-canvas-GA"></canvas>
+	</div>
+	<div class="info-container">
+		<div class="info-container-text">
+			<div class="info-container-name">Yandex</div>
+			<div class="info-container-score">1 из 13</div>
+		</div>
+		<canvas id="info-canvas-YA"></canvas>
+	</div>
+</div>
+<script type="text/javascript">
+
+	/*_____________________GP_PIE___________________*/
+
+	const gp_info = document.getElementById('info-canvas-GP');
+	const gp_info_setup = {
+		datasets: [
+			{
+				data: [46, 156-46],
+                backgroundColor: ["rgba(227, 138, 20, 0.7)", '#EDF2F7'],
+                borderWidth: 0,
+                borderRadius: 10
+			}
+		]
+	};
+	var gp_info_Opt = {
+        cutoutPercentage: 88,
+        animation: {
+            animationRotate: true,
+            duration: 2000
+        },
+        legend: {
+            display: false
+        },
+        tooltips: {
+            enabled: false
+        }
+    };
+	new Chart(gp_info, {
+		type: 'doughnut',
+		data: gp_info_setup,
+		options: gp_info_Opt
+	});
+
+	/*_____________________AS_PIE___________________*/
+
+	const as_info = document.getElementById('info-canvas-AS');
+	const as_info_setup = {
+		datasets: [
+			{
+				data: [32, 141-32],
+                backgroundColor: ["rgba(116, 109, 252, 0.7)", '#EDF2F7'],
+                borderWidth: 0,
+                borderRadius: 10
+			}
+		]
+	};
+	var as_info_Opt = {
+        cutoutPercentage: 88,
+        animation: {
+            animationRotate: true,
+            duration: 2000
+        },
+        legend: {
+            display: false
+        },
+        tooltips: {
+            enabled: false
+        }
+    };
+	new Chart(as_info, {
+		type: 'doughnut',
+		data: as_info_setup,
+		options: as_info_Opt
+	});
+
+	/*_____________________GA_PIE___________________*/
+
+	const ga_info = document.getElementById('info-canvas-GA');
+	const ga_info_setup = {
+		datasets: [
+			{
+				data: [124, 3025-124],
+                backgroundColor: ["rgba(142, 236, 5, 0.7)", '#EDF2F7'],
+                borderWidth: 0,
+                borderRadius: 10
+			}
+		]
+	};
+	var ga_info_Opt = {
+        cutoutPercentage: 88,
+        animation: {
+            animationRotate: true,
+            duration: 2000
+        },
+        legend: {
+            display: false
+        },
+        tooltips: {
+            enabled: false
+        }
+    };
+	new Chart(ga_info, {
+		type: 'doughnut',
+		data: ga_info_setup,
+		options: ga_info_Opt
+	});
+
+	/*_____________________YA_PIE___________________*/
+
+	const ya_info = document.getElementById('info-canvas-YA');
+	const ya_info_setup = {
+		datasets: [
+			{
+				data: [1, 13-1],
+                backgroundColor: ["rgba(234, 222, 10, 0.7)", '#EDF2F7'],
+                borderWidth: 0,
+                borderRadius: 10
+			}
+		]
+	};
+	var ya_info_Opt = {
+        cutoutPercentage: 88,
+        animation: {
+            animationRotate: true,
+            duration: 2000
+        },
+        legend: {
+            display: false
+        },
+        tooltips: {
+            enabled: false
+        }
+    };
+	new Chart(ya_info, {
+		type: 'doughnut',
+		data: ya_info_setup,
+		options: ya_info_Opt
+	});
+</script>

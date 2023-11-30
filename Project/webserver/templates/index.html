@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<!-- MATERIAL ICON -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp"
+      rel="stylesheet">
+    <!-- STYLESHEET -->
+	<link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+	<div class="container">
+		<aside>
+			<div class="top">
+				<div class="logo">
+					<img src="static/images/logo.png" alt="">
+				</div>
+				<div class="close" id="close-btn">
+					<span class="material-icons-sharp">close</span>
+				</div>
+			</div>
+			<div class="sidebar">
+				<a href="#" class="active" window_id="insights">
+					<span class="material-icons-sharp">trending_up</span>
+					<h3>Summary</h3>
+				</a>
+				<a href="#" window_id="rating-source">
+					<span class="material-icons-sharp">grid_view</span>
+					<h3>Sources</h3>
+				</a>
+				<a href="#" window_id="comments">
+					<span class="material-icons-sharp">chat</span>
+					<h3>Comments</h3>
+				</a>
+				<a href="#" window_id="problems">
+					<span class="material-icons-sharp">feedback</span>
+					<h3>Problems</h3>
+				</a>
+				<a href="#" window_id="table-comments">
+					<span class="material-icons-sharp">list_alt</span>
+					<h3>Table comments</h3>
+				</a>
+				<a href="#" id="Telegram" window_id="telegram">
+					<span class="material-icons-sharp">send</span>
+					<h3>Telegram</h3>
+				</a>																
+			</div>
+		</aside>
+		<main>
+			<h1>Dashboard</h1>
+			<div class="date">
+				<input type="date">
+			</div>
+			<div class="insights" id="insights">
+				{% include 'insights.html' %}
+			</div>
+			<div class="rating-source" style="display: none;">
+				{% include 'rating_source.html' %}
+			</div>
+			<div class="comments" style="display: none;">
+				<h1>There is nothing</h1>
+			</div>
+			<div class="problems" style="display: none;">
+				<h1>There is nothing</h1>
+			</div>
+			<div class="table-comments" style="display: none;">
+				{% include 'table_comments.html' %}
+			</div>
+			<div class="telegram" style="display: none;">
+				<h1>There is nothing</h1>
+			</div>
+		</main>
+		<div class="info-right">
+			<div class="right-gp">
+				<img src="static/images/gp-logo.png" alt="">
+				<p>{{ right_gp_score | safe}}</p>
+				<div class="right-change">
+					{% if right_gp_score_change_sign == '+' %}
+					<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+					<p style="color: var(--color-success);">{{ right_gp_score_change | safe}}</p>
+				    {% elif right_gp_score_change_sign == '-' %}
+					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+					<p style="color: var(--color-danger)">-{{ right_gp_score_change | safe}}</p>
+					{% endif %}
+				</div>		
+			</div>
+			<div class="right-as">
+				<img src="static/images/app_store_logo.png" alt="">
+				<p>{{ right_as_score | safe}}</p>
+				<div class="right-change">
+					{% if right_as_score_change_sign == '+' %}
+					<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+					<p style="color: var(--color-success);">{{ right_as_score_change | safe}}</p>
+				    {% elif right_as_score_change_sign == '-' %}
+					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+					<p style="color: var(--color-danger)">-{{ right_as_score_change | safe}}</p>
+					{% endif %}
+				</div>
+			</div>
+			<div class="right-ya">
+				<img src="static/images/ya-logo.png" alt="">
+				<p>{{ right_ya_score | safe}}</p>
+				<div class="right-change">
+					{% if right_ya_score_change_sign == '+' %}
+					<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+					<p style="color: var(--color-success);">{{ right_ya_score_change | safe}}</p>
+				    {% elif right_ya_score_change_sign == '-' %}
+					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+					<p style="color: var(--color-danger)">-{{ right_ya_score_change | safe}}</p>
+					{% endif %}
+				</div>
+			</div>
+			<div class="right-ga">
+				<img src="static/images/GA-logo.png" alt="">
+				<p>{{ right_ga_score | safe}}</p>
+				<div class="right-change">
+					{% if right_ga_score_change_sign == '+' %}
+					<span class="material-icons-sharp" style="color: var(--color-success);">trending_up</span>
+					<p style="color: var(--color-success);">{{ right_ga_score_change | safe}}</p>
+				    {% elif right_ga_score_change_sign == '-' %}
+					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
+					<p style="color: var(--color-danger)">-{{ right_ga_score_change | safe}}</p>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="popup">
+		<div class="popup_body">
+			<div class="popup_content">
+				<a href="##" class="popup_close">x</a>
+				<div class="popup_text">Текст отзыва</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="module" src="{{ url_for('static', path='/js/popup.js') }}"></script>
+<script src="{{ url_for('static', path='/js/aside_buttons.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/ajax.js') }}"></script>
+</html>
