@@ -1,18 +1,56 @@
+import os
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, select, func
+
+AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
+
+def init_query(table_name):
+    engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
+    conn = engine.connect()
+    metadata = MetaData(bind=engine)
+    table = Table(table_name, metadata, autoload=True)
+    return conn, table
+
+
 def get_avg_score_graph():
-    avg_score_count_1 = 2500
-    avg_score_count_2 = 1000
-    avg_score_count_3 = 1300
-    avg_score_count_4 = 5000
-    avg_score_count_5 = 9000
-    return avg_score_count_1, avg_score_count_2, avg_score_count_3, avg_score_count_4, avg_score_count_5
+    conn, reviews = init_query('reviews')
+    query = select([reviews.c.score, func.count(reviews.c.score)]).\
+        group_by(reviews.c.score)
+    result = conn.execute(query)
+    conn.close()
+    for score, count in result:
+        res.update({score: count})
+    return res[1], res[2], res[3], res[4], res[5]
     
 def get_avg_score():
-    avg_score = 4.23
-    avg_score_change = 0.09
-    avg_score_change_sign = '-'
+    # avg_score
+    conn, reviews = init_query('reviews')
+    query = select(func.avg(reviews.c.score))
+    result = conn.execute(query)
+    result = result.fetchone()
+    avg_score = round(float(result[0]), 2)
+
+    # avg_score_change
+    today_cte = select([func.avg(reviews.c.score).label('t')])\
+            .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 10).subquery()
+    yesterday_cte = select([func.avg(reviews.c.score).label('y')])\
+                    .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 11).subquery()
+    result = result.fetchone()
+    avg_score_change = int(round(float(result[0]), 2))
+
+    # avg_score_change_sign
+    avg_score_change_sign = '-' if float(result[0]) < 0 else '+'
+
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score():
+    conn, reviews = init_query('reviews')
+    case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
+    query = select([func.avg(case_expr)])
+    values = {'sentiment_1': 'NEGATIVE',
+          'param_1': 1,
+          'param_2': 0}
+    result = conn.execute(query, values)
+    result = result.fetchone()
     neg_score = 36.01
     neg_score_change = 10.5
     neg_score_change_sign = '-'
