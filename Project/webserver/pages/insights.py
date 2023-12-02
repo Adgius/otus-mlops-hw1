@@ -1,5 +1,6 @@
 import os
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, select, func
+from sqlalchemy import select, case
+from sqlalchemy import create_engine, MetaData, Table, select, func
 
 AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
 
@@ -31,9 +32,11 @@ def get_avg_score():
 
     # avg_score_change
     today_cte = select([func.avg(reviews.c.score).label('t')])\
-            .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 10).subquery()
+            .where(func.date(reviews.c.created_time) == func.CURRENT_DATE()).subquery()
     yesterday_cte = select([func.avg(reviews.c.score).label('y')])\
-                    .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 11).subquery()
+                    .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 1).subquery()
+    query = select(today_cte.c.t - yesterday_cte.c.y)
+    result = conn.execute(query, current_date_1=1)
     result = result.fetchone()
     avg_score_change = int(round(float(result[0]), 2))
 
@@ -43,6 +46,7 @@ def get_avg_score():
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score():
+    # neg_score
     conn, reviews = init_query('reviews')
     case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
     query = select([func.avg(case_expr)])
@@ -51,7 +55,9 @@ def get_neg_score():
           'param_2': 0}
     result = conn.execute(query, values)
     result = result.fetchone()
-    neg_score = 36.01
+    neg_score = int(round(float(result[0]), 2))
+
+    # neg_score_change
     neg_score_change = 10.5
     neg_score_change_sign = '-'
     return neg_score, neg_score_change, neg_score_change_sign
