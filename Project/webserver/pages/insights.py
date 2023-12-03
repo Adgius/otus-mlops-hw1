@@ -36,36 +36,91 @@ def get_avg_score():
     yesterday_cte = select([func.avg(reviews.c.score).label('y')])\
                     .where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 1).subquery()
     query = select(today_cte.c.t - yesterday_cte.c.y)
-    result = conn.execute(query, current_date_1=1)
+    result = conn.execute(query)
     result = result.fetchone()
-    avg_score_change = int(round(float(result[0]), 2))
+    avg_score_change = round(float(result[0]), 2)
 
     # avg_score_change_sign
-    avg_score_change_sign = '-' if float(result[0]) < 0 else '+'
+    avg_score_change_sign = '-' if avg_score_change < 0 else '+'
 
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score():
+    """
+    with today as (
+      select 
+          avg(case when sentiment = 'NEGATIVE' then 1 else 0 end) as t
+      from reviews r 
+      where date(created_time) = current_date - 15
+     ), 
+    yesterday as (
+      select 
+          avg(case when sentiment = 'NEGATIVE' then 1 else 0 end) as y
+      from reviews r 
+      where date(created_time) = current_date - 16
+     )
+    select t - y
+    from today
+    cross join yesterday
+    """
     # neg_score
     conn, reviews = init_query('reviews')
     case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
     query = select([func.avg(case_expr)])
-    values = {'sentiment_1': 'NEGATIVE',
-          'param_1': 1,
-          'param_2': 0}
-    result = conn.execute(query, values)
+    result = conn.execute(query)
     result = result.fetchone()
     neg_score = int(round(float(result[0]), 2))
 
     # neg_score_change
-    neg_score_change = 10.5
-    neg_score_change_sign = '-'
+    today_cte = select([func.avg(case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)).label('t')]).\
+            where(func.date(reviews.c.created_time) == func.CURRENT_DATE()).subquery()
+    yesterday_cte = select([func.avg(case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)).label('y')]).\
+                    where(func.date(reviews.c.created_time) == func.CURRENT_DATE() - 1).subquery()
+    query = select([today_cte.c.t - yesterday_cte.c.y])
+    result = conn.execute(query)
+    result = result.fetchone()
+    neg_score_change = round(float(result[0]), 2)
+    neg_score_change_sign = '-' if neg_score_change < 0 else '+'
     return neg_score, neg_score_change, neg_score_change_sign
 
 def get_rating_total():
-    y = [4.47,4.79,4.64,4.66,4.56,4.57,4.51,4.59,4.45,4.36,4.73,4.49,4.52,4.56,4.4,4.51,4.45,4.57,4.54,4.55,4.58,4.55,4.65,4.63,4.57,4.77,4.66,4.62,4.51,4.54,4.48,4.54,4.74,4.78,4.78,4.62,4.57,4.68,4.47,4.56,4.54,4.67,4.59,4.6,4.58,4.78,4.52,4.52,4.55,4.65,4.52,4.62,4.46,4.65,4.66]
-    return y
+    """
+    select date(created_time) as dt, avg(score) from reviews r 
+    group by dt
+    order by dt
+    limit 30
+    """
+    conn, reviews = init_query('reviews')
+    query = select([func.date(reviews.c.created_time).label('dt'), func.avg(reviews.c.score)]).\
+        group_by(func.date(reviews.c.created_time)).\
+        order_by(func.date(reviews.c.created_time)).\
+        limit(30)
+    result = conn.execute(query)
+    x, y = [], []
+    for row in result:
+        x.append(row[0].strftime('%Y-%m-%d'))
+        y.append(round(float(row[1]), 2))
+    return x, y
 
 def get_neg_total():
-    y = [4.47,4.79,4.64,4.66,4.56,4.57,4.51,4.59,4.45,4.36,4.73,4.49,4.52,4.56,4.4,4.51,4.45,4.57,4.54,4.55,4.58,4.55,4.65,4.63,4.57,4.77,4.66,4.62,4.51,4.54,4.48,4.54,4.74,4.78,4.78,4.62,4.57,4.68,4.47,4.56,4.54,4.67,4.59,4.6,4.58,4.78,4.52,4.52,4.55,4.65,4.52,4.62,4.46,4.65,4.66]
-    return y
+    """
+    select date(created_time) as dt, 
+       avg(case when sentiment = 'NEGATIVE' then 1 else 0 end) as neg
+    from reviews r
+    group by dt
+    order by dt
+    limit 30
+    """
+    case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
+
+    query = select([func.date(reviews.c.created_time).label('dt'),
+                    func.avg(case_expr).label('neg')]).\
+            group_by(func.date(reviews.c.created_time)).\
+            order_by(func.date(reviews.c.created_time)).\
+            limit(30)
+    result = conn.execute(query)
+    x, y = [], []
+    for row in result:
+        x.append(row[0].strftime('%Y-%m-%d'))
+        y.append(round(float(row[1]), 2))
+    return x, y

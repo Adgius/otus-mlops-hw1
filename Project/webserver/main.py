@@ -54,9 +54,8 @@ def execute_query(q: str):
 
 @app.get("/")
 def get_base_page(request: Request):
-    x = Data.dates
-    rating_total_y = get_rating_total()
-    neg_total_y = get_neg_total()
+    rating_total_x, rating_total_y = get_rating_total()
+    neg_total_x, neg_total_y = get_neg_total()
     avg_score_count_1, avg_score_count_2, avg_score_count_3, avg_score_count_4, avg_score_count_5 = get_avg_score_graph()
     avg_score, avg_score_change, avg_score_change_sign = get_avg_score()
     neg_score, neg_score_change, neg_score_change_sign = get_neg_score()
@@ -79,8 +78,9 @@ def get_base_page(request: Request):
 
     params = {
               'request': request, 
-              'x': x, 
+              'rating_total_x': rating_total_x, 
               'rating_total_y': rating_total_y, 
+              'neg_total_x': neg_total_x,
               'neg_total_y': neg_total_y, 
               'avg_score_count_1': avg_score_count_1,
               'avg_score_count_2': avg_score_count_2,

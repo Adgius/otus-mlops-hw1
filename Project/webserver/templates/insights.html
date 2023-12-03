@@ -109,7 +109,7 @@
 
 		const rating_total = document.getElementById('rating_total');
 		const Summary_rating_setup = {
-			labels: {{ x | safe}},
+			labels: {{ rating_total_x | safe}},
 			datasets: [
 			{
 				label: 'Summary rating',
@@ -131,7 +131,7 @@
 
 		const neg_total = document.getElementById('neg_total');
 		const neg_total_setup = {
-		labels: {{ x | safe}},
+		labels: {{ neg_total_x | safe}},
 		datasets: [
 			{
 			label: 'Positive',
