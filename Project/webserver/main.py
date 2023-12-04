@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Body
 from typing import List, Literal
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -34,6 +34,7 @@ class Table_comments(BaseModel):
     country: Literal['ru', 'kz', 'by']
     source: Literal['GooglePlay', 'AppStore', 'NPS', 'Yandex']
 
+default_date = True
 
 @app.get('/show_more_comments')
 def get_table_comments(length: int, with_filter: int):
@@ -52,13 +53,17 @@ def execute_query(q: str):
     comments = Query_Handler.query(q)
     return comments
 
+@app.post('/get_date')
+def get_date(date = Body()):
+    return date['date']
+
 @app.get("/")
-def get_base_page(request: Request):
-    rating_total_x, rating_total_y = get_rating_total()
-    neg_total_x, neg_total_y = get_neg_total()
-    avg_score_count_1, avg_score_count_2, avg_score_count_3, avg_score_count_4, avg_score_count_5 = get_avg_score_graph()
-    avg_score, avg_score_change, avg_score_change_sign = get_avg_score()
-    neg_score, neg_score_change, neg_score_change_sign = get_neg_score()
+def get_base_page(request: Request, date: str = datetime.datetime.now().strftime('%Y-%m-%d')):
+    rating_total_x, rating_total_y = get_rating_total(date)
+    neg_total_x, neg_total_y = get_neg_total(date)
+    avg_score_count_1, avg_score_count_2, avg_score_count_3, avg_score_count_4, avg_score_count_5 = get_avg_score_graph(date)
+    avg_score, avg_score_change, avg_score_change_sign = get_avg_score(date)
+    neg_score, neg_score_change, neg_score_change_sign = get_neg_score(date)
 
     right_gp_score, right_gp_score_change, right_gp_score_change_sign = get_right_gp_score()
     right_as_score, right_as_score_change, right_as_score_change_sign = get_right_as_score()
