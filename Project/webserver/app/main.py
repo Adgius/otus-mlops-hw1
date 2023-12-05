@@ -1,10 +1,6 @@
-import pandas as pd
 import os
 
 from fastapi import FastAPI, Request, Body
-from typing import List, Literal
-from enum import Enum
-from pydantic import BaseModel, Field
 from datetime import datetime
 
 from fastapi.staticfiles import StaticFiles
@@ -26,12 +22,6 @@ app.mount(
 )
 print(os.path.join(os.getcwd(), "static"))
 
-class Table_comments(BaseModel):
-    content: str
-    score: Literal[1, 2, 3, 4, 5]
-    at: datetime
-    country: Literal['ru', 'kz', 'by']
-    source: Literal['GooglePlay', 'AppStore', 'NPS', 'Yandex']
 
 default_date = True
 
