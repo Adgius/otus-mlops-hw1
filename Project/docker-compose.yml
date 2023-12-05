@@ -79,3 +79,14 @@ services:
     volumes:
       - ./pgvector/init_pgvector.sql:/docker-entrypoint-initdb.d/init_pgvector.sql
       - ./pgvector/init_data:/init_data
+
+  webserver:
+    image: ./webserver
+    container_name: fast-api
+    environment:
+      - AIRFLOW_CONN_REVIEWS_DB=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/mydb
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - database

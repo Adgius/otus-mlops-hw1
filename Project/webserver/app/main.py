@@ -10,7 +10,6 @@ from datetime import datetime
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from pages.manager import Data
 from pages.insights import *
 from pages.right_side import *
 from pages.rating_source import *
