@@ -81,7 +81,7 @@ services:
       - ./pgvector/init_data:/init_data
 
   webserver:
-    image: ./webserver
+    build: ./webserver
     container_name: fast-api
     environment:
       - AIRFLOW_CONN_REVIEWS_DB=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/mydb
