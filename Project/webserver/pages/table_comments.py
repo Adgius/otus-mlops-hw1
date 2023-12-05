@@ -1,26 +1,58 @@
 import pandas as pd
 import numpy as np
-from .manager import Data
 
+import os
+from sqlalchemy import select, case
+from sqlalchemy import create_engine, MetaData, Table, select, func
+from sqlalchemy.sql.elements import BooleanClauseList
 from nltk.stem.snowball import SnowballStemmer 
+
 stemmer = SnowballStemmer("russian") 
+AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
 
+def init_query(table_name):
+    engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
+    conn = engine.connect()
+    metadata = MetaData(bind=engine)
+    table = Table(table_name, metadata, autoload=True)
+    return conn, table
 
-def get_comments_from_table(n=100, with_filter=False):
-	if with_filter:
-		return Data.data.loc[Data.similarity_order, 'content'][Data.current_filter][:n].to_dict()
-	else:
-		return Data.data.loc[Data.similarity_order, 'content'][:n].to_dict()
+def get_comments_from_table(Query_Handler):
+    conn, reviews = init_query('reviews')
+    query = select([reviews.c.id, reviews.c.content])\
+            .where(Query_Handler.filter_)\
+            .order_by(Query_Handler.order_)\
+            .limit(Query_Handler.count_)
+    Query_Handler.count_ += 100
+    result = conn.execute(query)
+    output = {}
+    for row in result:
+        output.update({row[0]: row[1]})
+    return output
 
-def get_sim_comments_from_table(index):
-	cos_sim = lambda v, emb: np.dot(v, emb)/(np.linalg.norm(v)*np.linalg.norm(emb))
-	sim = np.array(list(map(lambda x: cos_sim(Data.embeddings[index], x), np.array(list(Data.embeddings.values())))))
-	Data.similarity_order = np.argsort(-sim)
-	return Data.data.loc[Data.similarity_order, 'content'].to_dict()
+def get_sim_comments_from_table(index, Query_Handler):
+    Query_Handler.filter_ = True
+    conn, reviews = init_query('reviews')
+	target_comment = select(reviews.c.embeddings)\
+            .where(reviews.c.id == index).subquery()
+    Query_Handler.order_ = reviews.c.embeddings.l2_distance(target_comment)
+    query = select([reviews.c.id, reviews.c.content])\
+            .order_by(Query_Handler.order_)\
+            .limit(Query_Handler.count_)
+    result = conn.execute(query)
+    output = {}
+    for row in result:
+        output.update({row[0]: row[1]})
+	return output
 
 class Query_Handler():
 
-    OPERATORS = {'ИЛИ': (1, lambda x, y: x | y), 'НЕ': (3, lambda x: ~x),
+    filter_ = True  # Current filter
+    order_ = None   # Current order
+    count_ = 100  # Current rows to show
+
+    OPERATORS = {'ИЛИ': (1, lambda x, y: x | y), 
+                 'НЕ': (3, lambda x: not_(x)),
                  'И': (2, lambda x, y: x & y)}
 
     @classmethod  
@@ -81,38 +113,33 @@ class Query_Handler():
 
     @classmethod    
     def calc(cls, tokens):
-	    cond_order = []
-	    stack = []
-	    for i in tokens:
-		    if i in cls.OPERATORS:
-		        cond_order.append(i)
-		    else:
-		    	cond_order.append(Data.data['content'].str.contains(i, regex=False, case=False).values)
-	    for i in cond_order:
-	    	if type(i) == np.ndarray:
-	    		stack.append(i)
-	    	else:
-	    		if i == 'НЕ':
-	    			el = stack.pop()
-	    			stack.append(cls.OPERATORS[i][1](el))
-	    		elif i == 'ИЛИ':
-	    			el1, el2 = stack.pop(), stack.pop()
-	    			stack.append(cls.OPERATORS[i][1](el1, el2))
-	    		elif i == 'И':
-	    			el1, el2 = stack.pop(), stack.pop()
-	    			stack.append(cls.OPERATORS[i][1](el1, el2))
-	    return stack[0]
+        stack = []
+        for i in tokens:
+            if i in cls.OPERATORS:
+                if i == 'НЕ':
+                    x = stack.pop() 
+                    x = x if type(BooleanClauseList) else reviews.c.content.ilike(f'%{x}%')
+                    stack.append(cls.OPERATORS[i][1](x))
+                else:
+                    y, x = stack.pop(), stack.pop()
+                    y = y if type(y) == BooleanClauseList else reviews.c.content.ilike(f'%{y}%')
+                    x = x if type(x) == BooleanClauseList else reviews.c.content.ilike(f'%{x}%')
+                    stack.append(cls.OPERATORS[i][1](x, y))
+            else:
+                stack.append(i)
+        return stack[0]
 
     @classmethod 
     def query(cls, q):
+        # conn, rating = init_query('rating')
         # вернуть дефолтный порядок сортировки
-        Data.similarity_order = list(range(Data.data.shape[0]))
         if len(q) > 0: 
-            q = Query_Handler.calc(Query_Handler.shunting_yard(Query_Handler.parse(q)))
-            # поставить новый фильтр
-            Data.current_filter = q
+            cls.filter_ = cls.calc(cls.shunting_yard(cls.parse(q)))
         else:
-            Data.current_filter = np.ones(Data.current_filter.shape[0], dtype=bool)
-        return get_comments_from_table(with_filter=True)
+            cls.filter_ = True 
+
+        cls.order_ = None
+        cls.order_ = 100
+        return filter_
 
 

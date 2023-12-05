@@ -65,8 +65,8 @@ def get_base_page(request: Request, date: str = datetime.datetime.now().strftime
     avg_score, avg_score_change, avg_score_change_sign = get_avg_score(date)
     neg_score, neg_score_change, neg_score_change_sign = get_neg_score(date)
 
-    right_gp_score, right_gp_score_change, right_gp_score_change_sign = get_right_gp_score()
-    right_as_score, right_as_score_change, right_as_score_change_sign = get_right_as_score()
+    right_gp_score, right_gp_score_change, right_gp_score_change_sign = get_right_gp_score(date)
+    right_as_score, right_as_score_change, right_as_score_change_sign = get_right_as_score(date)
     right_ya_score, right_ya_score_change, right_ya_score_change_sign = get_right_ya_score()
     right_ga_score, right_ga_score_change, right_ga_score_change_sign = get_right_ga_score()
 

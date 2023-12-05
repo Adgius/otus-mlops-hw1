@@ -39,7 +39,7 @@ def get_right_gp_score(date):
     return right_ga_score, right_ga_score_change, right_ga_score_change_sign
 
 
-def get_right_as_score():
+def get_right_as_score(date):
     # right_as_score
     conn, rating = init_query('rating')
     query = select(func.avg(rating.c.score)).\
