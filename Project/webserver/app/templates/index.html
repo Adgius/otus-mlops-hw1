@@ -84,7 +84,7 @@
 					<p style="color: var(--color-success);">{{ right_gp_score_change | safe}}</p>
 				    {% elif right_gp_score_change_sign == '-' %}
 					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
-					<p style="color: var(--color-danger)">-{{ right_gp_score_change | safe}}</p>
+					<p style="color: var(--color-danger)">{{ right_gp_score_change | safe}}</p>
 					{% endif %}
 				</div>		
 			</div>
@@ -97,7 +97,7 @@
 					<p style="color: var(--color-success);">{{ right_as_score_change | safe}}</p>
 				    {% elif right_as_score_change_sign == '-' %}
 					<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
-					<p style="color: var(--color-danger)">-{{ right_as_score_change | safe}}</p>
+					<p style="color: var(--color-danger)">{{ right_as_score_change | safe}}</p>
 					{% endif %}
 				</div>
 			</div>

@@ -8,12 +8,13 @@ from pgvector.sqlalchemy import Vector
 stemmer = SnowballStemmer("russian") 
 AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
 
-def init_query(table_name):
+def init_query():
     engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
     conn = engine.connect()
     metadata = MetaData(bind=engine)
-    table = Table(table_name, metadata, autoload=True)
-    return conn, table
+    reviews = Table('reviews', metadata, autoload=True)
+    rating = Table('rating', metadata, autoload=True)
+    return conn, reviews, rating
 
 
 class Query_Handler():
@@ -21,7 +22,7 @@ class Query_Handler():
     filter_ = True  # Current filter
     order_ = None   # Current order
     count_ = 100  # Current rows to show
-    conn_, reviews_ = init_query('reviews')
+    conn_, reviews_, rating_ = init_query()
     OPERATORS = {'ИЛИ': (1, lambda x, y: x | y), 
                  'НЕ': (3, lambda x: not_(x)),
                  'И': (2, lambda x, y: x & y)}

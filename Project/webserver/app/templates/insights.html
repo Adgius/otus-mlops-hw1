@@ -14,7 +14,7 @@
 				<p style="color: var(--color-success);">{{ avg_score_change | safe}}</p>
 			    {% elif avg_score_change_sign == '-' %}
 				<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
-				<p style="color: var(--color-danger)">-{{ avg_score_change | safe}}</p>
+				<p style="color: var(--color-danger)">{{ avg_score_change | safe}}</p>
 				{% endif %}
 			</div>
 		</div>
@@ -33,7 +33,7 @@
 				<p style="color: var(--color-success);">{{ neg_score_change | safe}}</p>
 			    {% elif neg_score_change_sign == '-' %}
 				<span class="material-icons-sharp" style="color: var(--color-danger);">trending_down</span>
-				<p style="color: var(--color-danger)">-{{ neg_score_change | safe}}</p>
+				<p style="color: var(--color-danger)">{{ neg_score_change | safe}}</p>
 				{% endif %}
 			</div>
 		</div>
@@ -142,7 +142,7 @@
 			},
 			{
 			label: 'Negative',
-			data: Array({{ x | safe}}.length).fill(5),
+			data: Array({{ x | safe}}.length).fill(100),
 			borderColor: 'rgba(252, 76, 76, 0.9)',
 			backgroundColor: 'rgba(252, 76, 76, 0.5)',
 			fill: '-1',

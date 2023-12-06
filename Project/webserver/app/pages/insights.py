@@ -3,15 +3,6 @@ from sqlalchemy import select, case
 from sqlalchemy import create_engine, MetaData, Table, select, func
 from pgvector.sqlalchemy import Vector
 
-def init_query(table_name):
-    AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
-    print('AIRFLOW_CONN_REVIEWS_DB', AIRFLOW_CONN_REVIEWS_DB)
-    engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
-    conn = engine.connect()
-    metadata = MetaData(bind=engine)
-    table = Table(table_name, metadata, autoload=True)
-    return conn, table
-
 
 def get_avg_score_graph(date: str, Query_Handler):
     print('getting get_avg_score_graph...')
@@ -42,10 +33,12 @@ def get_avg_score(date, Query_Handler):
     query = select(today_cte.c.t - yesterday_cte.c.y)
     result = conn.execute(query)
     result = result.fetchone()
-    avg_score_change = round(float(result[0]), 2)
+    avg_score_change = float(result[0])
 
     # avg_score_change_sign
     avg_score_change_sign = '-' if avg_score_change < 0 else '+'
+
+    avg_score_change = round(avg_score_change, 2)
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score(date, Query_Handler):
@@ -74,7 +67,7 @@ def get_neg_score(date, Query_Handler):
         .where(func.date(reviews.c.created_time) <= func.date(date))
     result = conn.execute(query)
     result = result.fetchone()
-    neg_score = int(round(float(result[0]), 2))
+    neg_score = int(round(float(result[0]), 2) * 100)
 
     # neg_score_change
     today_cte = select([func.avg(case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)).label('t')]).\
@@ -84,8 +77,9 @@ def get_neg_score(date, Query_Handler):
     query = select([today_cte.c.t - yesterday_cte.c.y])
     result = conn.execute(query)
     result = result.fetchone()
-    neg_score_change = round(float(result[0]), 2)
+    neg_score_change = float(result[0])
     neg_score_change_sign = '-' if neg_score_change < 0 else '+'
+    neg_score_change = round(neg_score_change, 2) * 100
     return neg_score, neg_score_change, neg_score_change_sign
 
 def get_rating_total(date, Query_Handler):
@@ -118,5 +112,5 @@ def get_neg_total(date, Query_Handler):
     x, y = [], []
     for row in result:
         x.append(row[0].strftime('%Y-%m-%d'))
-        y.append(round(float(row[1]), 2))
+        y.append(round(float(row[1]), 2) * 100)
     return x, y

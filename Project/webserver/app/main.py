@@ -54,8 +54,8 @@ def get_base_page(request: Request, date: str = '2023-11-15'): # dt.datetime.now
     avg_score, avg_score_change, avg_score_change_sign = get_avg_score(date, Query_Handler)
     neg_score, neg_score_change, neg_score_change_sign = get_neg_score(date, Query_Handler)
 
-    right_gp_score, right_gp_score_change, right_gp_score_change_sign = get_right_gp_score(date)
-    right_as_score, right_as_score_change, right_as_score_change_sign = get_right_as_score(date)
+    right_gp_score, right_gp_score_change, right_gp_score_change_sign = get_right_gp_score(date, Query_Handler)
+    right_as_score, right_as_score_change, right_as_score_change_sign = get_right_as_score(date, Query_Handler)
     right_ya_score, right_ya_score_change, right_ya_score_change_sign = get_right_ya_score()
     right_ga_score, right_ga_score_change, right_ga_score_change_sign = get_right_ga_score()
 
