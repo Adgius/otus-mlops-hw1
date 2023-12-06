@@ -1,13 +1,19 @@
 import initPopup from './popup.js';
 
 function update_table_content(json_text) {
-
 	// json_text: комменты из таблицы для добавления в таблицу в формате {index1: text_comment1, index2: text_comment2, ...}
 	// start_table_length: стартовый номер, с которого добавлять строки из json_text 
 	// update: стереть предыдущие строки
 	// idx: порядок индексов для json_text (при использовании similarity)
 
 	let last_element = document.querySelector("#main-table-comments tbody tr:last-child")
+
+	let new_tbody = document.createElement('tbody');
+	let old_tbody = document.querySelector("#main-table-comments tbody")
+	new_tbody.append(last_element)
+	old_tbody.parentNode.replaceChild(new_tbody, old_tbody)
+
+
 
 	// Комменты приходят по 100 штук, если есть остаток, значит комменты кончились
 	if (Object.keys(json_text).length < 100) {
@@ -50,7 +56,7 @@ document.getElementById("show_more_comments").onclick = function(e) {
 	xhr.onreadystatechange = function(){
 		if(xhr.readyState == 4 && xhr.status==200){
 			// console.log(JSON.parse(xhr.responseText));
-			update_table_content(JSON.parse(xhr.responseText), table_length, false)
+			update_table_content(JSON.parse(xhr.responseText))
 		}
 	}
 	xhr.send()
@@ -66,7 +72,7 @@ document.getElementById("help-query-confirm").onclick = function(e) {
 	xhr.onreadystatechange = function(){
 		if(xhr.readyState == 4 && xhr.status==200){
 			// console.log(xhr.responseText);
-			update_table_content(JSON.parse(xhr.responseText), 0, true);
+			update_table_content(JSON.parse(xhr.responseText));
 		}
 	}
 	xhr.send()
@@ -84,11 +90,8 @@ function initSimilarity() {
 			xhr.open('GET', `/get_sim_comments_from_table?index=${index}`)
 			xhr.onreadystatechange = function(){
 				if(xhr.readyState == 4 && xhr.status==200){
-					// console.log(xhr.responseText);
-					let pat = /(?<=\")\d+(?=\":\")/g
-					let idx = xhr.responseText.match(pat);
-					console.log(idx, isNaN(idx));
-					update_table_content(JSON.parse(xhr.responseText), 0, true, idx);
+					console.log(JSON.parse(xhr.responseText))
+					update_table_content(JSON.parse(xhr.responseText));
 				}
 			}
 			xhr.send()

@@ -13,9 +13,9 @@ def init_query(table_name):
     return conn, table
 
 
-def get_avg_score_graph(date: str):
+def get_avg_score_graph(date: str, Query_Handler):
     print('getting get_avg_score_graph...')
-    conn, reviews = init_query('reviews')
+    conn, reviews = Query_Handler.conn_, Query_Handler.reviews_
     query = select([reviews.c.score, func.count(reviews.c.score)]).\
         where(reviews.c.created_time <= func.date(date)).group_by(reviews.c.score)
     result = conn.execute(query)
@@ -25,10 +25,10 @@ def get_avg_score_graph(date: str):
         res.update({score: count})
     return res[1], res[2], res[3], res[4], res[5]
     
-def get_avg_score(date):
+def get_avg_score(date, Query_Handler):
     print('getting get_avg_score...')
     # avg_score
-    conn, reviews = init_query('reviews')
+    conn, reviews = Query_Handler.conn_, Query_Handler.reviews_
     query = select(func.avg(reviews.c.score))\
         .where(func.date(reviews.c.created_time) <= func.date(date))
     result = conn.execute(query)
@@ -50,7 +50,7 @@ def get_avg_score(date):
     conn.close()
     return avg_score, avg_score_change, avg_score_change_sign
 
-def get_neg_score(date):
+def get_neg_score(date, Query_Handler):
     print('getting get_neg_score...')
     """
     with today as (
@@ -70,7 +70,7 @@ def get_neg_score(date):
     cross join yesterday
     """
     # neg_score
-    conn, reviews = init_query('reviews')
+    conn, reviews = Query_Handler.conn_, Query_Handler.reviews_
     case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
     query = select([func.avg(case_expr)])\
         .where(func.date(reviews.c.created_time) <= func.date(date))
@@ -91,9 +91,9 @@ def get_neg_score(date):
     conn.close()
     return neg_score, neg_score_change, neg_score_change_sign
 
-def get_rating_total(date):
+def get_rating_total(date, Query_Handler):
     print('get_rating_total...')
-    conn, reviews = init_query('reviews')
+    conn, reviews = Query_Handler.conn_, Query_Handler.reviews_
     query = select([func.date(reviews.c.created_time).label('dt'), func.avg(reviews.c.score)]).\
             where((func.date(reviews.c.created_time) <= func.date(date)) & 
                   (func.date(reviews.c.created_time) > func.date(date) - 30)).\
@@ -107,9 +107,9 @@ def get_rating_total(date):
     conn.close()
     return x, y
 
-def get_neg_total(date):
+def get_neg_total(date, Query_Handler):
     print('getting get_neg_total...')
-    conn, reviews = init_query('reviews')
+    conn, reviews = Query_Handler.conn_, Query_Handler.reviews_
     case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
 
     query = select([func.date(reviews.c.created_time).label('dt'),

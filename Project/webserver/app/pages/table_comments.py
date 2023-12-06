@@ -94,13 +94,11 @@ class Query_Handler():
                     y, x = stack.pop(), stack.pop()
                     stack.append(cls.OPERATORS[i][1](x, y))
             else:
-                stack.append(cls.reviews.c.content.ilike(f'%{i}%'))
+                stack.append(cls.reviews_.c.content.ilike(f'%{i}%'))
         return stack[0]
 
     @classmethod 
     def query(cls, q):
-        # conn, rating = init_query('rating')
-        # вернуть дефолтный порядок сортировки
         if len(q) > 0: 
             cls.filter_ = cls._calc(cls._shunting_yard(cls._parse(q)))
         else:
@@ -116,7 +114,7 @@ class Query_Handler():
                 .order_by(cls.order_)\
                 .limit(cls.count_)
         cls.count_ += 100
-        result = conn_.execute(query)
+        result = cls.conn_.execute(query)
         output = {}
         for row in result:
             output.update({row[0]: row[1]})
@@ -125,13 +123,14 @@ class Query_Handler():
     @classmethod 
     def get_sim_comments_from_table(cls, index):
         cls.filter_ = True
+        cls.count_ = 100
         target_comment = select(cls.reviews_.c.embeddings)\
                 .where(cls.reviews_.c.id == index).subquery()
-        cls.order_ = reviews_.c.embeddings.l2_distance(target_comment)
-        query = select([reviews_.c.id, reviews_.c.content])\
+        cls.order_ = cls.reviews_.c.embeddings.l2_distance(target_comment)
+        query = select([cls.reviews_.c.id, cls.reviews_.c.content])\
                 .order_by(cls.order_)\
                 .limit(cls.count_)
-        result = conn.execute(query)
+        result = cls.conn_.execute(query)
         output = {}
         for row in result:
             output.update({row[0]: row[1]})
