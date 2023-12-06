@@ -34,7 +34,7 @@ def get_table_comments(**kwargs):
 @app.get('/get_sim_comments_from_table')
 def get_sim_table_comments(index: int):
     comments = Query_Handler.get_sim_comments_from_table(index)
-    return json.dumps(comments)  # to avoid sorting by key
+    return comments  # need to avoid sorting by key
 
 @app.get('/execute_query')
 def execute_query(q: str):

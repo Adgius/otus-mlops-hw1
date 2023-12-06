@@ -19,7 +19,6 @@ def get_avg_score_graph(date: str, Query_Handler):
     query = select([reviews.c.score, func.count(reviews.c.score)]).\
         where(reviews.c.created_time <= func.date(date)).group_by(reviews.c.score)
     result = conn.execute(query)
-    conn.close()
     res = {}
     for score, count in result:
         res.update({score: count})
@@ -47,7 +46,6 @@ def get_avg_score(date, Query_Handler):
 
     # avg_score_change_sign
     avg_score_change_sign = '-' if avg_score_change < 0 else '+'
-    conn.close()
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score(date, Query_Handler):
@@ -88,7 +86,6 @@ def get_neg_score(date, Query_Handler):
     result = result.fetchone()
     neg_score_change = round(float(result[0]), 2)
     neg_score_change_sign = '-' if neg_score_change < 0 else '+'
-    conn.close()
     return neg_score, neg_score_change, neg_score_change_sign
 
 def get_rating_total(date, Query_Handler):
@@ -104,7 +101,6 @@ def get_rating_total(date, Query_Handler):
     for row in result:
         x.append(row[0].strftime('%Y-%m-%d'))
         y.append(round(float(row[1]), 2))
-    conn.close()
     return x, y
 
 def get_neg_total(date, Query_Handler):
@@ -123,5 +119,4 @@ def get_neg_total(date, Query_Handler):
     for row in result:
         x.append(row[0].strftime('%Y-%m-%d'))
         y.append(round(float(row[1]), 2))
-    conn.close()
     return x, y

@@ -1,9 +1,8 @@
 import initPopup from './popup.js';
 
-function update_table_content(json_text) {
+function update_table_content(json_text, idx=new Array()) {
+
 	// json_text: комменты из таблицы для добавления в таблицу в формате {index1: text_comment1, index2: text_comment2, ...}
-	// start_table_length: стартовый номер, с которого добавлять строки из json_text 
-	// update: стереть предыдущие строки
 	// idx: порядок индексов для json_text (при использовании similarity)
 
 	let last_element = document.querySelector("#main-table-comments tbody tr:last-child")
@@ -35,12 +34,21 @@ function update_table_content(json_text) {
   		last_element.before(row)
 	}
 
-	if (Object.keys(json_text).length > 0) {
-		for (let [key, value] of Object.entries(json_text)) {
-			console.log(key, value);
+	// json сортируется по ключам, нужно задать свой порядок
+	if (idx.length > 0) {
+		console.log(idx)
+		for (let key of idx) {
+			let value = json_text[key]
 			add_row(key, value);
 		}
-		
+	} else {
+		if (Object.keys(json_text).length > 0) {
+			for (let [key, value] of Object.entries(json_text)) {
+				console.log(key, value);
+				add_row(key, value);
+			}
+
+		}		
 	}
 	initPopup();
 	initSimilarity();
@@ -90,8 +98,11 @@ function initSimilarity() {
 			xhr.open('GET', `/get_sim_comments_from_table?index=${index}`)
 			xhr.onreadystatechange = function(){
 				if(xhr.readyState == 4 && xhr.status==200){
-					console.log(JSON.parse(xhr.responseText))
-					update_table_content(JSON.parse(xhr.responseText));
+					// console.log(xhr.responseText);
+					let pat = /(?<=\")\d+(?=\":\")/g
+					let idx = xhr.responseText.match(pat);
+					console.log(idx, isNaN(idx));
+					update_table_content(JSON.parse(xhr.responseText), idx);
 				}
 			}
 			xhr.send()
