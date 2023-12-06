@@ -1,10 +1,11 @@
 import os
 from sqlalchemy import select, case
 from sqlalchemy import create_engine, MetaData, Table, select, func
-
-AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
+from pgvector.sqlalchemy import Vector
 
 def init_query(table_name):
+    AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
+    print('AIRFLOW_CONN_REVIEWS_DB', AIRFLOW_CONN_REVIEWS_DB)
     engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
     conn = engine.connect()
     metadata = MetaData(bind=engine)
@@ -13,16 +14,19 @@ def init_query(table_name):
 
 
 def get_avg_score_graph(date: str):
+    print('getting get_avg_score_graph...')
     conn, reviews = init_query('reviews')
     query = select([reviews.c.score, func.count(reviews.c.score)]).\
         where(reviews.c.created_time <= func.date(date)).group_by(reviews.c.score)
     result = conn.execute(query)
     conn.close()
+    res = {}
     for score, count in result:
         res.update({score: count})
     return res[1], res[2], res[3], res[4], res[5]
     
 def get_avg_score(date):
+    print('getting get_avg_score...')
     # avg_score
     conn, reviews = init_query('reviews')
     query = select(func.avg(reviews.c.score))\
@@ -43,10 +47,11 @@ def get_avg_score(date):
 
     # avg_score_change_sign
     avg_score_change_sign = '-' if avg_score_change < 0 else '+'
-
+    conn.close()
     return avg_score, avg_score_change, avg_score_change_sign
 
 def get_neg_score(date):
+    print('getting get_neg_score...')
     """
     with today as (
       select 
@@ -83,9 +88,11 @@ def get_neg_score(date):
     result = result.fetchone()
     neg_score_change = round(float(result[0]), 2)
     neg_score_change_sign = '-' if neg_score_change < 0 else '+'
+    conn.close()
     return neg_score, neg_score_change, neg_score_change_sign
 
-def get_rating_total():
+def get_rating_total(date):
+    print('get_rating_total...')
     conn, reviews = init_query('reviews')
     query = select([func.date(reviews.c.created_time).label('dt'), func.avg(reviews.c.score)]).\
             where((func.date(reviews.c.created_time) <= func.date(date)) & 
@@ -97,9 +104,12 @@ def get_rating_total():
     for row in result:
         x.append(row[0].strftime('%Y-%m-%d'))
         y.append(round(float(row[1]), 2))
+    conn.close()
     return x, y
 
-def get_neg_total():
+def get_neg_total(date):
+    print('getting get_neg_total...')
+    conn, reviews = init_query('reviews')
     case_expr = case([(reviews.c.sentiment == 'NEGATIVE', 1)], else_=0)
 
     query = select([func.date(reviews.c.created_time).label('dt'),
@@ -113,4 +123,5 @@ def get_neg_total():
     for row in result:
         x.append(row[0].strftime('%Y-%m-%d'))
         y.append(round(float(row[1]), 2))
+    conn.close()
     return x, y

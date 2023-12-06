@@ -14,7 +14,7 @@ def init_query(table_name):
 
 
 def get_right_gp_score(date):
-    # right_ga_score
+    # right_gp_score
     conn, rating = init_query('rating')
     query = select(func.avg(rating.c.score)).\
         where((rating.c.dates <= func.date(date)) &
@@ -23,12 +23,12 @@ def get_right_gp_score(date):
     result = result.fetchone()
     right_ga_score = round(float(result[0]), 2)
 
-    # right_ga_score_change
-    today_cte = select(func.avg(rating.c.score)).label('t').\
+    # right_gp_score_change
+    today_cte = select(func.avg(rating.c.score).label('t')).\
         where((rating.c.dates == func.date(date)) &
                (rating.c.source == 'GooglePlay')).subquery()
 
-    yesterday_cte = select(func.avg(rating.c.score)).label('y').\
+    yesterday_cte = select(func.avg(rating.c.score).label('y')).\
         where((rating.c.dates == func.date(date) - 1) &
                (rating.c.source == 'GooglePlay')).subquery()
     query = select([today_cte.c.t - yesterday_cte.c.y])
@@ -44,19 +44,19 @@ def get_right_as_score(date):
     conn, rating = init_query('rating')
     query = select(func.avg(rating.c.score)).\
         where((rating.c.dates <= func.date(date)) &
-               (rating.c.source == 'AppleStore'))
+               (rating.c.source == 'AppStore'))
     result = conn.execute(query)
     result = result.fetchone()
     right_as_score = round(float(result[0]), 2)
     
     # right_as_score_change
-    today_cte = select(func.avg(rating.c.score)).label('t').\
+    today_cte = select(func.avg(rating.c.score).label('t')).\
         where((rating.c.dates == func.date(date)) &
-               (rating.c.source == 'AppleStore')).subquery()
+               (rating.c.source == 'AppStore')).subquery()
 
-    yesterday_cte = select(func.avg(rating.c.score)).label('y').\
+    yesterday_cte = select(func.avg(rating.c.score).label('y')).\
         where((rating.c.dates == func.date(date) - 1) &
-               (rating.c.source == 'AppleStore')).subquery()
+               (rating.c.source == 'AppStore')).subquery()
     query = select([today_cte.c.t - yesterday_cte.c.y])
     result = conn.execute(query)
     result = result.fetchone()

@@ -1,6 +1,6 @@
 import initPopup from './popup.js';
 
-function update_table_content(json_text, start_table_length=0, update=true, idx=new Array()) {
+function update_table_content(json_text) {
 
 	// json_text: комменты из таблицы для добавления в таблицу в формате {index1: text_comment1, index2: text_comment2, ...}
 	// start_table_length: стартовый номер, с которого добавлять строки из json_text 
@@ -15,12 +15,6 @@ function update_table_content(json_text, start_table_length=0, update=true, idx=
 	} else {
 		last_element.style.display = 'table-cell';
 	}
-	if (update) {
-		let new_tbody = document.createElement('tbody');
-		let old_tbody = document.querySelector("#main-table-comments tbody")
-		new_tbody.append(last_element)
-		old_tbody.parentNode.replaceChild(new_tbody, old_tbody)
-	}
 
 	let add_row = function(key, value){
 		value = value.replaceAll('\\"', '"');
@@ -34,20 +28,13 @@ function update_table_content(json_text, start_table_length=0, update=true, idx=
   		row.appendChild(magic)
   		last_element.before(row)
 	}
-	if (idx.length > 0) {
-		console.log(idx)
-		for (let key of idx) {
-			let value = json_text[key]
+
+	if (Object.keys(json_text).length > 0) {
+		for (let [key, value] of Object.entries(json_text)) {
+			console.log(key, value);
 			add_row(key, value);
 		}
-	} else {
-		if (Object.keys(json_text).length > 0) {
-			for (let [key, value] of Object.entries(json_text).slice(start_table_length)) {
-				console.log(key, value);
-				add_row(key, value);
-			}
-
-		}		
+		
 	}
 	initPopup();
 	initSimilarity();
@@ -58,7 +45,7 @@ document.getElementById("show_more_comments").onclick = function(e) {
 	e.preventDefault();
 	let xhr = new XMLHttpRequest();
 	let table_length = document.querySelectorAll("#main-table-comments tbody tr").length - 1
-	xhr.open('GET', `/show_more_comments?length=${table_length}&with_filter=${1}`)
+	xhr.open('GET', `/show_more_comments`)
 	// xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
 	xhr.onreadystatechange = function(){
 		if(xhr.readyState == 4 && xhr.status==200){

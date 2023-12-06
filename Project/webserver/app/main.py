@@ -1,15 +1,14 @@
 import os
+import datetime as dt
 
 from fastapi import FastAPI, Request, Body
-from datetime import datetime
-
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from pages.insights import *
 from pages.right_side import *
 from pages.rating_source import *
-from pages.table_comments import get_comments_from_table, Query_Handler, get_sim_comments_from_table
+from pages.table_comments import Query_Handler
 
 templates = Jinja2Templates(directory="templates")
 
@@ -21,25 +20,24 @@ app.mount(
     name="static",
 )
 print(os.path.join(os.getcwd(), "static"))
-
+print(os.getenv('AIRFLOW_CONN_REVIEWS_DB'))
 
 default_date = True
 
 @app.get('/show_more_comments')
-def get_table_comments(length: int, with_filter: int):
-    with_filter = with_filter == 1
-    comments = get_comments_from_table(length + 100, with_filter)
-    # return '<|>'.join(comments.values)
+def get_table_comments(**kwargs):
+    comments = Query_Handler.get_comments_from_table()
     return comments
 
 @app.get('/get_sim_comments_from_table')
 def get_sim_table_comments(index: int):
-    comments = get_sim_comments_from_table(index)
+    comments = Query_Handler.get_sim_comments_from_table(index)
     return comments
 
 @app.get('/execute_query')
 def execute_query(q: str):
-    comments = Query_Handler.query(q)
+    Query_Handler.query(q)
+    comments = Query_Handler.get_comments_from_table()
     return comments
 
 @app.post('/get_date')
@@ -47,7 +45,7 @@ def get_date(date = Body()):
     return date['date']
 
 @app.get("/")
-def get_base_page(request: Request, date: str = datetime.datetime.now().strftime('%Y-%m-%d')):
+def get_base_page(request: Request, date: str = '2023-11-15'): # dt.datetime.now().strftime('%Y-%m-%d')
     rating_total_x, rating_total_y = get_rating_total(date)
     neg_total_x, neg_total_y = get_neg_total(date)
     avg_score_count_1, avg_score_count_2, avg_score_count_3, avg_score_count_4, avg_score_count_5 = get_avg_score_graph(date)
@@ -68,9 +66,10 @@ def get_base_page(request: Request, date: str = datetime.datetime.now().strftime
     ga_score = get_ga_score()
     ga_count = get_ga_count()
 
-    comments = get_comments_from_table()
+    comments = Query_Handler.get_comments_from_table()
 
     params = {
+              'x': x, # from rating_source (test var)
               'request': request, 
               'rating_total_x': rating_total_x, 
               'rating_total_y': rating_total_y, 
