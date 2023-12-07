@@ -82,7 +82,7 @@ services:
 
   webserver:
     build: ./webserver
-    command: uvicorn app.main:app --host 0.0.0.0
+    command: uvicorn main:app --host 0.0.0.0
     container_name: fast-api
     environment:
       - AIRFLOW_CONN_REVIEWS_DB=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/mydb
