@@ -53,7 +53,7 @@
 		<main>
 			<h1>Dashboard</h1>
 			<div class="date">
-				<input id="date_input" type="date" value="2023-12-04">
+				<input id="date_input" type="date" value={{ date | safe}} onchange="window.location.href='/?date=' + this.value ">
 			</div>
 			<div class="insights" id="insights">
 				{% include 'insights.html' %}

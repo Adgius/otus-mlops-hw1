@@ -22,9 +22,8 @@ app.mount(
     name="static",
 )
 print(os.path.join(os.getcwd(), "static"))
-print(os.getenv('AIRFLOW_CONN_REVIEWS_DB'))
 
-default_date = True
+
 
 @app.get('/show_more_comments')
 def get_table_comments(**kwargs):
@@ -71,6 +70,7 @@ def get_base_page(request: Request, date: str = '2023-11-15'): # dt.datetime.now
     comments = Query_Handler.get_comments_from_table()
 
     params = {
+              'date': date,
               'x': x, # from rating_source (test var)
               'request': request, 
               'rating_total_x': rating_total_x, 

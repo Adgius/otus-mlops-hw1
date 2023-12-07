@@ -7,6 +7,7 @@ from pgvector.sqlalchemy import Vector
 
 stemmer = SnowballStemmer("russian") 
 AIRFLOW_CONN_REVIEWS_DB = os.getenv('AIRFLOW_CONN_REVIEWS_DB')
+print(os.getenv('AIRFLOW_CONN_REVIEWS_DB'))
 
 def init_query():
     engine = create_engine(AIRFLOW_CONN_REVIEWS_DB)
