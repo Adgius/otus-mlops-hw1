@@ -26,8 +26,6 @@ services:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
     restart: "no"
-    networks:
-      - kafka-net
     ports:
       - "9000:9000"
     environment:
