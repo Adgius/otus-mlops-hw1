@@ -19,7 +19,7 @@ services:
     image: obsidiandynamics/kafka
     container_name: kafka
     restart: "no"
-    command: opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test
+    # command: opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test
     networks:
       - kafka-net
     ports:
