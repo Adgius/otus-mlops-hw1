@@ -19,7 +19,6 @@ services:
     image: obsidiandynamics/kafka
     container_name: kafka
     restart: "no"
-    command: bash -c "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1"
     networks:
       - kafka-net
     ports:
@@ -35,6 +34,13 @@ services:
     depends_on:
       - zookeeper
 
+  init-kafka:
+    image: obsidiandynamics/kafka
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1"
+    
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
