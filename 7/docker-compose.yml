@@ -38,6 +38,8 @@ services:
     image: obsidiandynamics/kafka
     depends_on:
       - kafka
+    networks:
+      - kafka-net
     entrypoint: [ '/bin/sh', '-c' ]
     command:
       "
