@@ -23,6 +23,15 @@ services:
       - kafka-net
     ports:
       - "9092:9092"
+    command:
+      "
+      sleep 15
+      kafka-topics --bootstrap-server kafka:29092 --list
+      echo -e 'Creating kafka topics'
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
     environment:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
       KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092
@@ -34,22 +43,6 @@ services:
     depends_on:
       - zookeeper
 
-  init-kafka:
-    image: obsidiandynamics/kafka
-    depends_on:
-      - kafka
-    networks:
-      - kafka-net
-    entrypoint: [ '/bin/sh', '-c' ]
-    command:
-      "
-      kafka-topics --bootstrap-server kafka:29092 --list
-      sleep 15
-      echo -e 'Creating kafka topics'
-      /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka:29092 --list
-      "
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
