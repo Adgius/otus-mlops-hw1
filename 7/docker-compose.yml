@@ -39,8 +39,14 @@ services:
     depends_on:
       - kafka
     entrypoint: [ '/bin/sh', '-c' ]
-    command: "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1"
-    
+    command:
+      "
+      kafka-topics --bootstrap-server kafka:29092 --list
+      echo -e 'Creating kafka topics'
+      /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
