@@ -16,22 +16,13 @@ services:
       - "2181:2181"
 
   kafka:
-    image: obsidiandynamics/kafka
+    image: wurstmeister/kafka
     container_name: kafka
     restart: "no"
     networks:
       - kafka-net
     ports:
       - "9092:9092"
-    command:
-      "
-      sleep 15
-      kafka-topics --bootstrap-server kafka:29092 --list
-      echo -e 'Creating kafka topics'
-      /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test --partitions 1 --replication-factor 1
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka:29092 --list
-      "
     environment:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
       KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092
@@ -40,6 +31,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: test-topic:1:1
     depends_on:
       - zookeeper
 
