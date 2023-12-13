@@ -1,7 +1,6 @@
 import os
-from sqlalchemy import select, case
-from sqlalchemy import create_engine, MetaData, Table, select, func
-from sqlalchemy.sql.elements import BooleanClauseList
+from sqlalchemy import select
+from sqlalchemy import create_engine, MetaData, Table, select, func, not_
 from nltk.stem.snowball import SnowballStemmer 
 from pgvector.sqlalchemy import Vector
 
