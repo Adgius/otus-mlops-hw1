@@ -11,8 +11,8 @@ from src.pipeline.rating import run_rating
 
 with DAG(
     dag_id='update_data',
-    schedule_interval='@once',
-    start_date=datetime(2023, 11, 29),
+    schedule_interval='0 5 * * *',
+    start_date=datetime(2023, 12, 12),
     catchup=False,
     dagrun_timeout=timedelta(minutes=120)
 ) as dag:
