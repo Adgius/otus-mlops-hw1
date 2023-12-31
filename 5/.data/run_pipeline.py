@@ -1,25 +1,20 @@
-# coding: utf8
-
 import argparse
 import os
-
-import findspark
-findspark.init()
-findspark.find()
+import pyspark.sql.types as T
+import pyspark.sql.functions as F
 
 from pyspark.sql import SparkSession, SQLContext
-from pyspark.sql import functions as F
+
 from pyspark.ml import Pipeline, Transformer
 
 from pyspark.ml.feature import VectorAssembler, StandardScaler, Imputer
 from pyspark.sql.window import Window
 from pyspark.sql import DataFrame
 from functools import reduce
-from typing import Iterable
-from pyspark.ml.classification import LogisticRegression
-from pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit
+from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit, CrossValidator
+from pyspark.ml.evaluation import BinaryClassificationEvaluator, Evaluator
 from datetime import datetime
-from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.ml.util import MLReadable, MLWritable
 
 import mlflow
@@ -35,56 +30,128 @@ import warnings
 warnings.simplefilter('ignore')
 
 
-features = ['tx_amount', 'tx_time_seconds_prev', 'tx_time_seconds_duration', 'tx_amount_prev', 
-'tx_amount_duration', 'tx_time_seconds_diff', 'tx_amount_diff', 
-'tx_time_seconds_mean', 'tx_amount_mean', 'terminal_id_prev', 'terminal_id_amount_mean', 'terminal_id_time_mean']
+features = ['tx_amount', 'tx_time_seconds', 'tx_time_days',
+            'weekend', 'day_night', 'avg_transaction_count_1',
+            'avg_transaction_count_7', 'avg_transaction_count_30', 'avg_transaction_mean_1',
+            'avg_transaction_mean_7', 'avg_transaction_mean_30', 'avg_transaction_terminal_id_count_1',
+            'avg_transaction_terminal_id_count_7', 'avg_transaction_terminal_id_count_30',
+            "sum_fraud_terminal_id_count_1", "sum_fraud_terminal_id_count_7", "sum_fraud_terminal_id_count_30"]
 target = 'tx_fraud'
 attributes = features + [target]
 
+class FNR_metric(Evaluator):
+
+    def __init__(self, predictionCol='prediction', labelCol='tx_fraud'):
+        self.predictionCol = predictionCol
+        self.labelCol = labelCol
+
+    def _evaluate(self, dataset):
+        tp = dataset.filter((F.col(self.labelCol) == 1) & (F.col(self.predictionCol) == 1)).count()
+        fn = dataset.filter((F.col(self.labelCol) == 1) & (F.col(self.predictionCol) == 0)).count()
+        fnr = fn / (fn + tp)
+        return fnr
+
+    def isLargerBetter(self):
+        return True
+    
+class FPR_metric(Evaluator):
+
+    def __init__(self, predictionCol='prediction', labelCol='tx_fraud'):
+        self.predictionCol = predictionCol
+        self.labelCol = labelCol
+
+    def _evaluate(self, dataset):
+        tn = dataset.filter((F.col(self.labelCol) == 0) & (F.col(self.predictionCol) == 0)).count()
+        fp = dataset.filter((F.col(self.labelCol) == 0) & (F.col(self.predictionCol) == 1)).count()
+        fpr = fp / (fp + tn)
+        return fpr
+
+    def isLargerBetter(self):
+        return True
+
+class DataFixer(Transformer):
+
+    def __init__(self):
+        super(DataFixer, self).__init__()
+
+    def _transform(self, df: DataFrame) -> DataFrame:
+        """
+        Здесь можно описать исправления для данных перед генерацией новых признаков
+        """
+        df = df.withColumn('tx_datetime', fix_date_udf(F.col('tx_datetime')))
+
+
+        return df
+
 class FeatureGenerator(Transformer, MLReadable, MLWritable):
 
-    #def __init__(self, features: Iterable[str]):
-    def __init__(self, features):
+    def __init__(self):
         super(FeatureGenerator, self).__init__()
-        self.features = features
 
-    #def _transform(self, df: DataFrame) -> DataFrame:     
-    def _transform(self, df):                   
-        w1 = Window().partitionBy("customer_id").orderBy(F.asc("tx_time_seconds"))
-        w2 = Window().partitionBy("terminal_id").orderBy(F.asc("tx_time_seconds"))
-        w3 = Window().partitionBy('customer_id').orderBy(F.asc('tx_time_seconds')).rowsBetween(1, 3)
-                           
-        df = df.withColumn("tx_time_seconds_prev", F.lag("tx_time_seconds").over(w1))
-        df = df.withColumn('tx_time_seconds_duration',  F.col('tx_time_seconds') - F.col('tx_time_seconds_prev'))
+    def _transform(self, df: DataFrame) -> DataFrame:
+        days = lambda i: i * 86400  # Hive timestamp is interpreted as UNIX timestamp in seconds*
+        # выходной день
+        df = df.withColumn('weekend', F.when(F.dayofweek(F.col('tx_datetime')).isin([5,6]), 1).otherwise(0))
 
-        df = df.withColumn("tx_amount_prev", F.lag("tx_amount").over(w1))
-        df = df.withColumn('tx_amount_duration',  F.col('tx_amount') - F.col('tx_amount_prev'))
+        # время суток
+        df = df.withColumn('day_night', F.when(F.hour(F.col('tx_datetime')) < 9, 1).otherwise(0))
 
-        df = df.withColumn('tx_time_seconds_diff',  F.col('tx_time_seconds_duration') / F.col('tx_time_seconds_prev'))
-        df = df.withColumn('tx_amount_diff',  F.col('tx_amount_duration') / F.col('tx_amount_prev'))
+        w1 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(1), 0)
+        w2 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(7), 0)
+        w3 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(30), 0)
 
-        # Сколько в среднем за последние 3 транзакции
-        df = df.withColumn('tx_time_seconds_mean',  F.mean('tx_time_seconds_duration').over(w3))
-        df = df.withColumn('tx_amount_mean',  F.mean('tx_amount_duration').over(w3))      
+        w4 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(1), 0)
+        w5 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(7), 0)
+        w6 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(30), 0)
 
-        # Тот же терминал
-        df = df.withColumn("terminal_id_prev", F.lag("terminal_id").over(w2))
-        df = df.withColumn('terminal_id_prev',  (F.col('terminal_id') == F.col('terminal_id_prev')).cast('integer'))
+        # скользящее среднее числа транзакций по каждой карте
+        df = df.withColumn("avg_transaction_count_1", F.count("tranaction_id").over(w1))
+        df = df.withColumn("avg_transaction_count_7", F.count("tranaction_id").over(w2))
+        df = df.withColumn("avg_transaction_count_30", F.count("tranaction_id").over(w3))
 
-        # Какая в средняя стата по терминалу у клиента
-        df = df.withColumn("terminal_id_amount_mean", F.mean("tx_amount_duration").over(w2))
-        df = df.withColumn("terminal_id_time_mean", F.mean("tx_time_seconds_duration").over(w2))
-             
+        # скользящее среднее суммы транзакций по каждой карте
+        df = df.withColumn("avg_transaction_mean_1", F.mean("tx_amount").over(w1))
+        df = df.withColumn("avg_transaction_mean_7", F.mean("tx_amount").over(w2))
+        df = df.withColumn("avg_transaction_mean_30", F.mean("tx_amount").over(w3))
+
+        # скользящее среднее числа транзакций по каждому терминалу
+        df = df.withColumn("avg_transaction_terminal_id_count_1", F.count("terminal_id").over(w4))
+        df = df.withColumn("avg_transaction_terminal_id_count_7", F.count("terminal_id").over(w5))
+        df = df.withColumn("avg_transaction_terminal_id_count_30", F.count("terminal_id").over(w6))
+
+        # скользящее сумма по числу мошейнических операций на данном терминале
+        df = df.withColumn("sum_fraud_terminal_id_count_1", F.sum("tx_fraud").over(w4))
+        df = df.withColumn("sum_fraud_terminal_id_count_7", F.sum("tx_fraud").over(w5))
+        df = df.withColumn("sum_fraud_terminal_id_count_30", F.sum("tx_fraud").over(w6))
         return df
-    
+ 
+def fix_date(d, verbose=False):
+    try:
+        date, time = d.split()
+        Y = date.split('-')[0]
+        m = date.split('-')[1]
+        d = date.split('-')[2]
+        H = time.split(':')[0]
+        M = time.split(':')[1]
+        S = time.split(':')[2]
+        if H == '24':
+            H = '23'
+            data = dt.datetime.strptime(f'{Y}-{m}-{d} {H}:{M}:{S}', '%Y-%m-%d %H:%M:%S') + dt.timedelta(hours=1)
+        else:
+            data = dt.datetime.strptime(f'{Y}-{m}-{d} {H}:{M}:{S}', '%Y-%m-%d %H:%M:%S')
+        return data.replace(tzinfo=pytz.timezone('Europe/Moscow'))
+    except:
+        return None
+
+fix_date_udf = udf(lambda x: fix_date(x), T.TimestampType())    
 
 def get_pipeline():
-    generator = FeatureGenerator(features=attributes)
+    fixer = DataFixer()
+    generator = FeatureGenerator()
     imputer = Imputer(inputCols=features, outputCols=features)
     assembler = VectorAssembler(inputCols=features, outputCol='features')
     scaler = StandardScaler(inputCol='features', outputCol='features_scaled')
-    lr = LogisticRegression(featuresCol='features_scaled', labelCol='tx_fraud')
-    pipeline = Pipeline(stages=[generator, imputer, assembler, scaler, lr])
+    pipeline = Pipeline(stages=[fixer, generator, imputer, assembler, scaler])
     return pipeline
 
 def set_env(args):
@@ -94,6 +161,7 @@ def set_env(args):
     os.environ['AWS_SECRET_ACCESS_KEY'] = args.AWS_SECRET_ACCESS_KEY
     os.environ['MLFLOW_ARTIFACT_URI'] = args.MLFLOW_ARTIFACT_URI
     os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk-pom:1.10.34,org.apache.hadoop:hadoop-aws:2.7.2 pyspark-shell'
+
 def main(args):
 
     set_env(args)
@@ -146,50 +214,61 @@ def main(args):
         df = reduce(DataFrame.unionAll, dfs)
 
         logger.info("Getting new pipeline ...")
-        inf_pipeline = get_pipeline()
+        transform_pipeline = get_pipeline()
         
-        lr = inf_pipeline.getStages()[-1]
+        df = transform_pipeline.fit(df).transform(df)
+
+        clf = DecisionTreeClassifier(featuresCol='features_scaled', labelCol='tx_fraud')
         
         paramGrid =  ParamGridBuilder() \
-                    .addGrid(lr.regParam, [1.0, 2.0]) \
-                    .addGrid(lr.maxIter, [50, 100]) \
+                    .addGrid(DecisionTreeClassifier().maxDepth, [2, 4]) \
+                    .addGrid(DecisionTreeClassifier().minInstancesPerNode , [2, 5]) \
                     .build()
 
         evaluator = BinaryClassificationEvaluator(labelCol=target)
 
         # By default 80% of the data will be used for training, 20% for validation.
         trainRatio = 1 - val_frac
-                
-        # A TrainValidationSplit requires an Estimator, a set of Estimator ParamMaps, and an Evaluator.
-        tvs = TrainValidationSplit(estimator=inf_pipeline, estimatorParamMaps=paramGrid, evaluator=evaluator, parallelism=1, seed=42)
+        
+        logger.info("Upsampling train dataset ...")        
+        train, test = df.randomSplit([trainRatio, val_frac])
+        train_0 = train.where(F.col(target)==0)
+        train_1 = train.where(F.col(target)==1).sample(True, float(train.where(F.col(target)==0).count() / train.where(F.col(target)==1).count()))
+        train = train_0.union(train_1)
+        train.cache(), test.cache()
 
         # Run TrainValidationSplit, and choose the best set of parameters.
         logger.info("Fitting new inference pipeline ...")
-        model = tvs.fit(df)
+        cv = CrossValidator(estimator=clf,
+                    estimatorParamMaps=paramGrid,
+                    evaluator=evaluator)
+        cv_model = cv.fit(train)
 
         # Log params, metrics and model with MLFlow
 
         run_id = mlflow.active_run().info.run_id
         logger.info("Logging optimal parameters to MLflow run {} ...".format(run_id))
 
-        best_regParam = model.bestModel.stages[-1].getRegParam()
-        best_fitIntercept = model.bestModel.stages[-1].getFitIntercept()
-        best_elasticNetParam = model.bestModel.stages[-1].getElasticNetParam()
+        best_MaxDepth = cv_model.bestModel.getMaxDepth()
+        best_MinInstancesPerNode = cv_model.bestModel.getMinInstancesPerNode()
 
-        logger.info(model.bestModel.stages[-1].explainParam('regParam'))
-        logger.info(model.bestModel.stages[-1].explainParam('fitIntercept'))
-        logger.info(model.bestModel.stages[-1].explainParam('elasticNetParam'))
+        logger.info(cv_model.bestModel.explainParam('maxDepth'))
+        logger.info(cv_model.bestModel.explainParam('minInstancesPerNode'))
 
-        mlflow.log_param('optimal_regParam', best_regParam)
-        mlflow.log_param('optimal_fitIntercept', best_fitIntercept)
-        mlflow.log_param('optimal_elasticNetParam', best_elasticNetParam)
+        mlflow.log_param('optimal_maxDepth', best_MaxDepth)
+        mlflow.log_param('optimal_MinInstancesPerNode', best_MinInstancesPerNode)
 
         logger.info("Scoring the model ...")
-        predictions = model.transform(df)
-        metric = evaluator.evaluate(predictions)
+        predictions = cv_model.transform(test)
+        fpr = FPR_metric().evaluate(predictions)
+        fnr = FNR_metric().evaluate(predictions)
+        logger.info("FPR: {}".format(fpr))
+        logger.info("FNR: {}".format(fnr))
+
+
         logger.info("Logging metrics to MLflow run {} ...".format(run_id))
-        mlflow.log_metric("areaUnderROC", metric)
-        logger.info("Model areaUnderROC: {}".format(metric))
+        mlflow.log_metric("FPR", fpr)
+        mlflow.log_metric("FNR", fnr)
 
         logger.info("Saving model ...")
         mlflow.spark.save_model(model.bestModel.stages[-1], output_artifact)
