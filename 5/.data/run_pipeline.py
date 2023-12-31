@@ -1,32 +1,35 @@
 import argparse
 import os
+
+# Set app environ
+os.environ['PYSPARK_PYTHON'] = "./pyspark_pex_env.pex"
+
 import pyspark.sql.types as T
 import pyspark.sql.functions as F
+import mlflow
+import logging
+import boto3
+import warnings
+
+from functools import reduce
+from datetime import datetime as dt
 
 from pyspark.sql import SparkSession, SQLContext
-
-from pyspark.ml import Pipeline, Transformer
-
-from pyspark.ml.feature import VectorAssembler, StandardScaler, Imputer
 from pyspark.sql.window import Window
 from pyspark.sql import DataFrame
-from functools import reduce
+
+from pyspark.ml import Pipeline, Transformer
+from pyspark.ml.feature import VectorAssembler, StandardScaler, Imputer
 from pyspark.ml.classification import DecisionTreeClassifier
 from pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit, CrossValidator
 from pyspark.ml.evaluation import BinaryClassificationEvaluator, Evaluator
-from datetime import datetime
 from pyspark.ml.util import MLReadable, MLWritable
 
-import mlflow
-from mlflow.tracking import MlflowClient
-
-import logging
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
 
-import boto3
-import warnings
+
 warnings.simplefilter('ignore')
 
 
@@ -163,7 +166,8 @@ def set_env(args):
     os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk-pom:1.10.34,org.apache.hadoop:hadoop-aws:2.7.2 pyspark-shell'
 
 def main(args):
-
+    
+    logger.info("Add credentials to environment ...")
     set_env(args)
 
     input_bucket = args.input_bucket
@@ -180,17 +184,16 @@ def main(args):
 
     mlflow.set_tracking_uri('http://{}:5000'.format(args.mlflow_tracking_uri))
 
-    # If experiment does not exist
+    logger.info("Create experiment ...")
     try:
         mlflow.create_experiment('baseline')
     except:
-        pass
+        logger.info("Experiment already exists")
 
     # Prepare MLFlow experiment for logging
-    client = MlflowClient()
-    experiment = client.get_experiment_by_name("baseline")
+    experiment = mlflow.get_experiment_by_name('baseline')
     experiment_id = experiment.experiment_id
-    run_name = 'My run name' + ' ' + str(datetime.now())
+    run_name = 'My run name' + ' ' + str(dt.datetime.now())
 
     with mlflow.start_run(run_name=run_name, experiment_id=experiment_id):
         logger.info("tracking URI: %s", {mlflow.get_tracking_uri()})

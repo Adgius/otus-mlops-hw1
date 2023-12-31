@@ -25,7 +25,7 @@ Variable.set('AWS_SECRET_ACCESS_KEY', AWS_SECRET_ACCESS_KEY)
 with DAG(
         dag_id='run_script',
         schedule_interval='0 6 * * *',
-        start_date=datetime(2023, 9, 30),
+        start_date=datetime(2023, 12, 31),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
         tags=['airflow-hw-5'],
@@ -34,28 +34,24 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath=['/opt/airflow/data/clean-data.py', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
-                remote_filepath=['/home/ubuntu/clean-data.py', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
+                local_filepath=['/opt/airflow/data/pex_env.sh', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
+                remote_filepath=['/home/ubuntu/pex_env.sh', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
                 operation='put',
                 create_intermediate_dirs=True
             )
-
-    ssh_task1 = SSHOperator(
-                task_id="installing_python_libs",
-                command='/opt/conda/bin/python -m pip install mlflow==1.27.0 findspark urllib3==1.25.8 pyyaml',
-                ssh_hook=ssh_hook,
-                cmd_timeout=None)
     
-    ssh_task2 = SSHOperator(
+    ssh_task1 = SSHOperator(
                 task_id="execute_ETL",
-                command="/opt/conda/bin/python /home/ubuntu/clean-data.py {} {}".format(Variable.get("AWS_ACCESS_KEY_ID"), Variable.get("AWS_SECRET_ACCESS_KEY")), # Почему-то в системе стоят два питона
+                command="bash /home/ubuntu/pex_env.sh",
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
     
-    ssh_task3 = SSHOperator(
+    ssh_task2 = SSHOperator(
             task_id="train_model",
-            command="/opt/conda/bin/python /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
+            command="spark-submit --files pyspark_pex_env.pex \
+            --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
+             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
                                                                                                         MLFLOW_URL, 
                                                                                                         Variable.get("AWS_ACCESS_KEY_ID"), 
                                                                                                         Variable.get("AWS_SECRET_ACCESS_KEY"),
