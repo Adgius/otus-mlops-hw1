@@ -50,7 +50,9 @@ with DAG(
 
     ssh_task2 = SSHOperator(
             task_id="train_model",
-            command="export PYSPARK_PYTHON='/home/ubuntu/environment/bin/python; spark-submit --archives pyspark_venv.tar.gz#environment --jars /home/ubuntu/mlflow-spark-1.27.0.jar /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
+            command="export PYSPARK_PYTHON='/home/ubuntu/environment/bin/python'; spark-submit --archives pyspark_venv.tar.gz#environment \
+            --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
+             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
                                                                                      MLFLOW_URL, 
                                                                                      Variable.get("AWS_ACCESS_KEY_ID"), 
                                                                                      Variable.get("AWS_SECRET_ACCESS_KEY"),
