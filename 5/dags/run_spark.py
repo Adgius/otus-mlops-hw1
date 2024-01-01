@@ -34,22 +34,29 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath=['/opt/airflow/data/pex_env.sh', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
-                remote_filepath=['/home/ubuntu/pex_env.sh', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
+                local_filepath=['/opt/airflow/data/pyspark_env.sh', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
+                remote_filepath=['/home/ubuntu/pyspark_env.sh', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
                 operation='put',
                 create_intermediate_dirs=True
             )
     
     ssh_task1 = SSHOperator(
-                task_id="pack_python_libs",
-                command="bash /home/ubuntu/pex_env.sh",
+                task_id="install_python_libs",
+                command="bash /home/ubuntu/pyspark_env.sh",
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
+                task_id="pack_python_libs",
+                command="venv-pack -o pyspark_venv.tar.gz",
+                ssh_hook=ssh_hook,
+                get_pty=False,
+                cmd_timeout=None)
+
+    ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="export PYSPARK_PYTHON=./pyspark_pex_env.pex; spark-submit --files pyspark_pex_env.pex \
+            command="export PYSPARK_PYTHON=./environment/bin/python; spark-submit --archives pyspark_venv.tar.gz#environment \
             --jars /home/ubuntu/mlflow-spark-1.27.0.jar \
             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
                                                                                      MLFLOW_URL, 
@@ -61,6 +68,6 @@ with DAG(
             get_pty=False,
             cmd_timeout=None)
     
-    sftp_task >> ssh_task1 >> ssh_task2
+    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
 if __name__ == "__main__":
     dag.cli()
