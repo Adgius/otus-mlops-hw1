@@ -77,7 +77,7 @@ class DataFixer(Transformer):
     def __init__(self):
         super(DataFixer, self).__init__()
 
-    def _transform(self, df: DataFrame) -> DataFrame:
+    def _transform(self, df):
         """
         Здесь можно описать исправления для данных перед генерацией новых признаков
         """
@@ -91,7 +91,7 @@ class FeatureGenerator(Transformer, MLReadable, MLWritable):
     def __init__(self):
         super(FeatureGenerator, self).__init__()
 
-    def _transform(self, df: DataFrame) -> DataFrame:
+    def _transform(self, df):
         days = lambda i: i * 86400  # Hive timestamp is interpreted as UNIX timestamp in seconds*
         # выходной день
         df = df.withColumn('weekend', F.when(F.dayofweek(F.col('tx_datetime')).isin([5,6]), 1).otherwise(0))

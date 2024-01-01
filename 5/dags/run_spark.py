@@ -54,7 +54,7 @@ with DAG(
                 get_pty=False,
                 cmd_timeout=None)
 
-    ssh_task2 = SSHOperator(
+    ssh_task3 = SSHOperator(
             task_id="train_model",
             command="spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
             --conf spark.executorEnv.PYTHONPATH=./environment/bin/python \
@@ -69,6 +69,6 @@ with DAG(
             get_pty=False,
             cmd_timeout=None)
     
-    sftp_task >> ssh_task1 >> ssh_task2
+    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
 if __name__ == "__main__":
     dag.cli()
