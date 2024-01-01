@@ -163,7 +163,7 @@ def set_env(args):
     os.environ['AWS_ACCESS_KEY_ID'] = args.AWS_ACCESS_KEY_ID
     os.environ['AWS_SECRET_ACCESS_KEY'] = args.AWS_SECRET_ACCESS_KEY
     os.environ['MLFLOW_ARTIFACT_URI'] = args.MLFLOW_ARTIFACT_URI
-    os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk-pom:1.10.34,org.apache.hadoop:hadoop-aws:2.7.2 pyspark-shell'
+    # os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages com.amazonaws:aws-java-sdk-pom:1.10.34,org.apache.hadoop:hadoop-aws:2.7.2 pyspark-shell'
 
 def main(args):
     
