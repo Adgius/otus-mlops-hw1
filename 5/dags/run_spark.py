@@ -48,7 +48,7 @@ with DAG(
                 cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
-                task_id="install_python_libs",
+                task_id="pack_python_libs",
                 command="venv-pack -o pyspark_venv.tar.gz",
                 ssh_hook=ssh_hook,
                 get_pty=False,
