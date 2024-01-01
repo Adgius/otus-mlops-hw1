@@ -146,7 +146,7 @@ def create_ssh_connection(**kwargs):
 with DAG(
     dag_id='create-spark-cluster',
     schedule_interval='@once',
-    start_date=datetime(2023, 9, 24),
+    start_date=datetime(2024, 1, 1),
     catchup=False,
     dagrun_timeout=timedelta(minutes=120),
     tags=['airflow-hw-4'],

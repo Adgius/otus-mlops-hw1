@@ -25,7 +25,7 @@ Variable.set('AWS_SECRET_ACCESS_KEY', AWS_SECRET_ACCESS_KEY)
 with DAG(
         dag_id='run_script',
         schedule_interval='0 6 * * *',
-        start_date=datetime(2023, 12, 31),
+        start_date=datetime(2024, 1, 1),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
         tags=['airflow-hw-5'],
@@ -41,7 +41,7 @@ with DAG(
             )
     
     ssh_task1 = SSHOperator(
-                task_id="execute_ETL",
+                task_id="pack_python_libs",
                 command="bash /home/ubuntu/pex_env.sh",
                 ssh_hook=ssh_hook,
                 get_pty=False,
@@ -49,18 +49,18 @@ with DAG(
     
     ssh_task2 = SSHOperator(
             task_id="train_model",
-            command="spark-submit --files pyspark_pex_env.pex \
-            --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
-             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
-                                                                                                        MLFLOW_URL, 
-                                                                                                        Variable.get("AWS_ACCESS_KEY_ID"), 
-                                                                                                        Variable.get("AWS_SECRET_ACCESS_KEY"),
-                                                                                                        AWS_DEFAULT_REGION,
-                                                                                                        MLFLOW_S3_ENDPOINT_URL),
+            command="export PYSPARK_PYTHON=./pyspark_pex_env.pex; spark-submit --files pyspark_pex_env.pex \
+            --jars /home/ubuntu/mlflow-spark-1.27.0.jar \
+            /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
+                                                                                     MLFLOW_URL, 
+                                                                                     Variable.get("AWS_ACCESS_KEY_ID"), 
+                                                                                     Variable.get("AWS_SECRET_ACCESS_KEY"),
+                                                                                     AWS_DEFAULT_REGION,
+                                                                                     MLFLOW_S3_ENDPOINT_URL),
             ssh_hook=ssh_hook,
             get_pty=False,
             cmd_timeout=None)
     
-    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
+    sftp_task >> ssh_task1 >> ssh_task2
 if __name__ == "__main__":
     dag.cli()
