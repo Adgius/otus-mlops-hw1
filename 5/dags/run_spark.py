@@ -34,8 +34,8 @@ with DAG(
     sftp_task = SFTPOperator(
                 task_id='sftp_transfer',
                 ssh_hook=ssh_hook,
-                local_filepath=['/opt/airflow/data/pyspark_env.sh', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
-                remote_filepath=['/home/ubuntu/pyspark_env.sh', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
+                local_filepath=['/opt/airflow/data/test.py', '/opt/airflow/data/pyspark_env.sh', '/opt/airflow/data/run_pipeline.py', '/opt/airflow/data/mlflow-spark-1.27.0.jar'],
+                remote_filepath=['/home/ubuntu/test.py', '/home/ubuntu/pyspark_env.sh', '/home/ubuntu/run_pipeline.py', '/home/ubuntu/mlflow-spark-1.27.0.jar'],
                 operation='put',
                 create_intermediate_dirs=True
             )
@@ -50,6 +50,14 @@ with DAG(
     ssh_task2 = SSHOperator(
                 task_id="pack_python_libs",
                 command="source /home/ubuntu/pyspark_venv/bin/activate; venv-pack -o pyspark_venv.tar.gz",
+                ssh_hook=ssh_hook,
+                get_pty=False,
+                cmd_timeout=None)
+
+    ssh_test = SSHOperator(
+                task_id="test_task",
+                command="spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
+            --conf spark.executorEnv.PYTHONPATH=./environment/bin/python test.py",
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
@@ -69,6 +77,6 @@ with DAG(
             get_pty=False,
             cmd_timeout=None)
     
-    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
+    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_test >> ssh_task3
 if __name__ == "__main__":
     dag.cli()
