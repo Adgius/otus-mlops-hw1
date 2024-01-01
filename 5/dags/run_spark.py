@@ -42,7 +42,7 @@ with DAG(
     
     ssh_task1 = SSHOperator(
                 task_id="install_python_libs",
-                command="bash /home/ubuntu/pyspark_env.sh",
+                command="bash /home/ubuntu/pyspark_env.sh ",
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
