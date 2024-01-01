@@ -47,14 +47,8 @@ with DAG(
                 get_pty=False,
                 cmd_timeout=None)
     
-    ssh_task2 = SSHOperator(
-                task_id="pack_python_libs",
-                command="venv-pack -o pyspark_venv.tar.gz",
-                ssh_hook=ssh_hook,
-                get_pty=False,
-                cmd_timeout=None)
 
-    ssh_task3 = SSHOperator(
+    ssh_task2 = SSHOperator(
             task_id="train_model",
             command="export PYSPARK_PYTHON=./environment/bin/python; spark-submit --archives pyspark_venv.tar.gz#environment \
             --jars /home/ubuntu/mlflow-spark-1.27.0.jar \
@@ -68,6 +62,6 @@ with DAG(
             get_pty=False,
             cmd_timeout=None)
     
-    sftp_task >> ssh_task1 >> ssh_task2 >> ssh_task3
+    sftp_task >> ssh_task1 >> ssh_task2
 if __name__ == "__main__":
     dag.cli()
