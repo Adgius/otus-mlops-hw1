@@ -146,7 +146,7 @@ def fix_date(d, verbose=False):
     except:
         return None
 
-fix_date_udf = udf(lambda x: fix_date(x), T.TimestampType())    
+fix_date_udf = F.udf(lambda x: fix_date(x), T.TimestampType())    
 
 def get_pipeline():
     fixer = DataFixer()
