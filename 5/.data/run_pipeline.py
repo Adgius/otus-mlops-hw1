@@ -1,8 +1,6 @@
 import argparse
 import os
-
-# Set app environ
-os.environ['PYSPARK_PYTHON'] = "./pyspark_pex_env.pex"
+import sys
 
 import pyspark.sql.types as T
 import pyspark.sql.functions as F
@@ -32,6 +30,8 @@ logger = logging.getLogger()
 
 warnings.simplefilter('ignore')
 
+logger.info("Python path: {}".format(sys.executable))
+logger.info("Python version: {}".format(sys.version))
 
 features = ['tx_amount', 'tx_time_seconds', 'tx_time_days',
             'weekend', 'day_night', 'avg_transaction_count_1',
