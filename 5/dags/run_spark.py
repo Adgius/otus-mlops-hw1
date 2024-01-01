@@ -49,7 +49,7 @@ with DAG(
     
     ssh_task2 = SSHOperator(
                 task_id="pack_python_libs",
-                command="source pyspark_venv/bin/activate; venv-pack -o pyspark_venv.tar.gz",
+                command="source /home/ubuntu/pyspark_venv/bin/activate; venv-pack -o pyspark_venv.tar.gz",
                 ssh_hook=ssh_hook,
                 get_pty=False,
                 cmd_timeout=None)
