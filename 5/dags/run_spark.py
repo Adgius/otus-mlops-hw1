@@ -61,13 +61,13 @@ with DAG(
 
     ssh_test2 = SSHOperator(
                 task_id="test_task2",
-                command="printenv",
+                command="sudo printenv",
                 ssh_hook=ssh_hook,
                 cmd_timeout=None)
 
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
+            command="sudo spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
             --conf spark.executorEnv.PYTHONPATH=./environment/bin/python \
             --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
              /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
@@ -77,8 +77,7 @@ with DAG(
                                                                                      AWS_DEFAULT_REGION,
                                                                                      MLFLOW_S3_ENDPOINT_URL),
             ssh_hook=ssh_hook,
-            cmd_timeout=None,
-            environment={'PYSPARK_PYTHON': './environment/bin/python'})
+            cmd_timeout=None)
     
     sftp_task >> ssh_task1 >> ssh_task2 >> ssh_test >> ssh_test2 >> ssh_task3
 if __name__ == "__main__":
