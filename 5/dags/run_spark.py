@@ -61,7 +61,7 @@ with DAG(
 
     ssh_test2 = SSHOperator(
                 task_id="test_task2",
-                command="sudo printenv",
+                command='echo -e "printenv" >> $HOME/test2.sh; bash test2.sh',
                 ssh_hook=ssh_hook,
                 cmd_timeout=None)
 
