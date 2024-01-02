@@ -10,7 +10,7 @@ from airflow.models import Variable
 from airflow.operators.bash import BashOperator
 
 
-ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
+ssh_hook = SSHHook(ssh_conn_id='test') 
 
 MLFLOW_URL = os.getenv('MLFLOW_URL')
 MLFLOW_S3_ENDPOINT_URL = os.getenv('MLFLOW_S3_ENDPOINT_URL')
