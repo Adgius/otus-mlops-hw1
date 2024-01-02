@@ -44,14 +44,12 @@ with DAG(
                 task_id="install_python_libs",
                 command="bash /home/ubuntu/pyspark_env.sh ",
                 ssh_hook=ssh_hook,
-                get_pty=False,
                 cmd_timeout=None)
     
     ssh_task2 = SSHOperator(
                 task_id="pack_python_libs",
                 command="source /home/ubuntu/pyspark_venv/bin/activate; venv-pack -o pyspark_venv.tar.gz",
                 ssh_hook=ssh_hook,
-                get_pty=False,
                 cmd_timeout=None)
 
     ssh_test = SSHOperator(
@@ -59,14 +57,12 @@ with DAG(
                 command="spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
             --conf spark.executorEnv.PYTHONPATH=./environment/bin/python test.py",
                 ssh_hook=ssh_hook,
-                get_pty=True,
                 cmd_timeout=None)
 
     ssh_test2 = SSHOperator(
                 task_id="test_task2",
                 command="printenv",
                 ssh_hook=ssh_hook,
-                get_pty=True,
                 cmd_timeout=None)
 
     ssh_task3 = SSHOperator(
@@ -81,8 +77,8 @@ with DAG(
                                                                                      AWS_DEFAULT_REGION,
                                                                                      MLFLOW_S3_ENDPOINT_URL),
             ssh_hook=ssh_hook,
-            get_pty=True,
-            cmd_timeout=None)
+            cmd_timeout=None,
+            environment={'PYSPARK_PYTHON': './environment/bin/python'})
     
     sftp_task >> ssh_task1 >> ssh_task2 >> ssh_test >> ssh_test2 >> ssh_task3
 if __name__ == "__main__":
