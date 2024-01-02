@@ -61,7 +61,7 @@ with DAG(
 
     ssh_test2 = SSHOperator(
                 task_id="test_task2",
-                command="echo -e 'whoami'",
+                command="whoami",
                 ssh_hook=ssh_hook,
                 cmd_timeout=None)
 
