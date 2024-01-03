@@ -145,7 +145,7 @@ def read_csv(s3obj, spark, limit=100000):
                                      try_convert(row[0], int),
                                      try_convert(row[1], str), 
                                      try_convert(row[2], int),
-                                     try_convert(row[3], float), 
+                                     try_convert(row[3], int), 
                                      try_convert(row[4], float),
                                      try_convert(row[5], float),
                                      try_convert(row[6], float),
