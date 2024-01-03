@@ -248,6 +248,7 @@ def main(args):
         dfs = []
         for data in data_bucket.objects.all():
             dfs.append(read_csv(data, spark, limit=100000))
+            break  # test
 
         df = reduce(DataFrame.unionAll, dfs)
 
