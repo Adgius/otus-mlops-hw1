@@ -127,7 +127,42 @@ class FeatureGenerator(Transformer, MLReadable, MLWritable):
         df = df.withColumn("sum_fraud_terminal_id_count_7", F.sum("tx_fraud").over(w5))
         df = df.withColumn("sum_fraud_terminal_id_count_30", F.sum("tx_fraud").over(w6))
         return df
- 
+
+def read_csv(s3obj, limit=100000):
+
+    def try_convert(x, func):
+        try:
+            return func(x)
+        except:
+            return float('nan')
+
+    rdd = sc.textFile(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key))
+    rdd = sc.parallelize(rdd.take(limit))
+    bad_header =  rdd.first()
+    rdd = rdd.filter(lambda line: line != bad_header)
+    temp_var = rdd.map(lambda row: row.split(","))
+    temp_var = temp_var.map(lambda row: (
+                                     try_convert(row[0], int),
+                                     try_convert(row[1], str), 
+                                     try_convert(row[2], float),
+                                     try_convert(row[3], float), 
+                                     try_convert(row[4], float),
+                                     try_convert(row[5], float),
+                                     try_convert(row[6], float),
+                                     try_convert(row[7], float),
+                                     try_convert(row[8], float))
+                       )
+    schema = StructType([StructField('tranaction_id', LongType(), True),
+                         StructField('tx_datetime', StringType(), True),
+                         StructField('customer_id', LongType(), True),
+                         StructField('terminal_id', LongType(), True),
+                         StructField('tx_amount', DoubleType(), True),
+                         StructField('tx_time_seconds', LongType(), True),
+                         StructField('tx_time_days', LongType(), True),
+                         StructField('tx_fraud', LongType(), True),
+                         StructField('tx_fraud_scenario', LongType(), True),])
+    return spark.createDataFrame(temp_var, schema) 
+
 def fix_date(d, verbose=False):
     try:
         date, time = d.split()
@@ -212,7 +247,7 @@ def main(args):
         logger.info("Loading Data ...")
         dfs = []
         for data in data_bucket.objects.all():
-            dfs.append(sql.read.parquet('s3a://{}/{}'.format(input_bucket, data.key)).limit(100000))
+            dfs.append(df = read_csv(data, limit=100000))
 
         df = reduce(DataFrame.unionAll, dfs)
 
