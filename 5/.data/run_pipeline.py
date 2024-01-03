@@ -285,7 +285,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Model (Inference Pipeline) Training")
 
     parser.add_argument("-f", "--val_frac", type=float, default=0.2, help="Size of the validation split. Fraction of the dataset.")
-    parser.add_argument("-i", "--input_bucket", type=str, default ='otus-mlops-data-clear', help="Name for the bucket with input data")
+    parser.add_argument("-i", "--input_bucket", type=str, default ='otus-mlops-hw2', help="Name for the bucket with input data")
     parser.add_argument("-o", "--output_artifact", type=str, help="Name for the output serialized model (Inference Artifact folder)" ,required=True,)
     parser.add_argument('-u', '--mlflow_tracking_uri', type=str, help='mlflow_tracking_uri')
     parser.add_argument('-r', '--AWS_DEFAULT_REGION', type=str, help='AWS_DEFAULT_REGION')
