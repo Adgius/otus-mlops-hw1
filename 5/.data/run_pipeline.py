@@ -152,15 +152,15 @@ def read_csv(s3obj, spark, limit=100000):
                                      try_convert(row[7], float),
                                      try_convert(row[8], float))
                        )
-    schema = StructType([StructField('tranaction_id', LongType(), True),
-                         StructField('tx_datetime', StringType(), True),
-                         StructField('customer_id', LongType(), True),
-                         StructField('terminal_id', LongType(), True),
-                         StructField('tx_amount', DoubleType(), True),
-                         StructField('tx_time_seconds', LongType(), True),
-                         StructField('tx_time_days', LongType(), True),
-                         StructField('tx_fraud', LongType(), True),
-                         StructField('tx_fraud_scenario', LongType(), True),])
+    schema = StructType([T.StructField('tranaction_id', T.LongType(), True),
+                         T.StructField('tx_datetime', T.StringType(), True),
+                         T.StructField('customer_id', T.LongType(), True),
+                         T.StructField('terminal_id', T.LongType(), True),
+                         T.StructField('tx_amount', T.DoubleType(), True),
+                         T.StructField('tx_time_seconds', T.LongType(), True),
+                         T.StructField('tx_time_days', T.LongType(), True),
+                         T.StructField('tx_fraud', T.LongType(), True),
+                         T.StructField('tx_fraud_scenario', T.LongType(), True),])
     return spark.createDataFrame(temp_var, schema) 
 
 def fix_date(d, verbose=False):
