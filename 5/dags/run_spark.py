@@ -10,7 +10,7 @@ from airflow.models import Variable
 from airflow.operators.bash import BashOperator
 
 
-ssh_hook = SSHHook(ssh_conn_id='test') 
+ssh_hook = SSHHook(ssh_conn_id='cluster_ssh_connection') 
 
 MLFLOW_URL = os.getenv('MLFLOW_URL')
 MLFLOW_S3_ENDPOINT_URL = os.getenv('MLFLOW_S3_ENDPOINT_URL')
@@ -52,25 +52,12 @@ with DAG(
                 ssh_hook=ssh_hook,
                 cmd_timeout=None)
 
-    ssh_test = SSHOperator(
-                task_id="test_task",
-                command="spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
-            --conf spark.executorEnv.PYTHONPATH=./environment/bin/python test.py",
-                ssh_hook=ssh_hook,
-                cmd_timeout=None)
-
-    ssh_test2 = SSHOperator(
-                task_id="test_task2",
-                command="bash test2.sh ",
-                ssh_hook=ssh_hook,
-                cmd_timeout=None)
-
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command="sudo spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
+            command='bash -l -c "spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
             --conf spark.executorEnv.PYTHONPATH=./environment/bin/python \
             --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
-             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}".format('baseline', 
+             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}"'.format('baseline', 
                                                                                      MLFLOW_URL, 
                                                                                      Variable.get("AWS_ACCESS_KEY_ID"), 
                                                                                      Variable.get("AWS_SECRET_ACCESS_KEY"),
