@@ -57,8 +57,8 @@ with DAG(
             command='bash -l -c "spark-submit --archives pyspark_venv.tar.gz#environment \
             --master yarn \
             --deploy-mode cluster \
-            --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./environment/bin/python \
-            --jars mlflow-spark-1.27.0.jar\
+            --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./environment/bin/python, spark.hadoop.fs.s3a.impl=org.apache.hadoop.fs.s3a.S3AFileSystem \
+            --packages org.mlflow:mlflow-spark:1.27.0, com.amazonaws:aws-java-sdk-pom:1.10.34, org.apache.hadoop:hadoop-aws:2.7.2 \
              run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}"'.format('baseline', 
                                                                                      MLFLOW_URL, 
                                                                                      Variable.get("AWS_ACCESS_KEY_ID"), 
