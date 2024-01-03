@@ -147,10 +147,10 @@ def read_csv(s3obj, spark, limit=100000):
                                      try_convert(row[2], int),
                                      try_convert(row[3], int), 
                                      try_convert(row[4], float),
-                                     try_convert(row[5], float),
-                                     try_convert(row[6], float),
-                                     try_convert(row[7], float),
-                                     try_convert(row[8], float))
+                                     try_convert(row[5], int),
+                                     try_convert(row[6], int),
+                                     try_convert(row[7], int),
+                                     try_convert(row[8], int))
                        )
     schema = T.StructType([T.StructField('tranaction_id', T.LongType(), True),
                          T.StructField('tx_datetime', T.StringType(), True),
