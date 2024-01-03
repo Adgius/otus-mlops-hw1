@@ -310,10 +310,10 @@ def main(args):
         mlflow.log_metric("FNR", fnr)
 
         logger.info("Saving model ...")
-        mlflow.spark.save_model(model.bestModel.stages[-1], output_artifact)
+        mlflow.spark.save_model(cv_model.bestModel, output_artifact)
 
         logger.info("Exporting/logging model ...")
-        mlflow.spark.log_model(model.bestModel.stages[-1], output_artifact)
+        mlflow.spark.log_model(cv_model.bestModel, output_artifact)
         logger.info("Done")
 
 if __name__ == "__main__":
