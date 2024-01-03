@@ -66,6 +66,6 @@ with DAG(
             ssh_hook=ssh_hook,
             cmd_timeout=None)
     
-    sftp_task >> ssh_test >> ssh_test2 >> ssh_task1 >> ssh_task2 >>  ssh_task3
+    sftp_task >> ssh_task1 >> ssh_task2 >>  ssh_task3
 if __name__ == "__main__":
     dag.cli()
