@@ -134,7 +134,7 @@ def read_csv(s3obj, spark, limit=100000):
         try:
             return func(x)
         except:
-            return float('nan')
+            return None
 
     rdd = spark.read.text(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key)).rdd
     rdd = spark.sparkContext.parallelize(rdd.take(limit))
