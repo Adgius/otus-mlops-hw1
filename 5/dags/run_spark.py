@@ -24,7 +24,7 @@ Variable.set('AWS_SECRET_ACCESS_KEY', AWS_SECRET_ACCESS_KEY)
 
 with DAG(
         dag_id='run_script',
-        schedule_interval='0 6 * * *',
+        schedule_interval='@once',
         start_date=datetime(2024, 1, 1),
         catchup=False,
         dagrun_timeout=timedelta(minutes=120),
@@ -54,10 +54,10 @@ with DAG(
 
     ssh_task3 = SSHOperator(
             task_id="train_model",
-            command='bash -l -c "spark-submit --archives /home/ubuntu/pyspark_venv.tar.gz#environment \
-            --conf spark.executorEnv.PYTHONPATH=./environment/bin/python \
-            --jars /home/ubuntu/mlflow-spark-1.27.0.jar\
-             /home/ubuntu/run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}"'.format('baseline', 
+            command='bash -l -c "spark-submit \
+            --archives pyspark_venv.tar.gz#environment \
+            --jars mlflow-spark-1.27.0.jar\
+             run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}"'.format('baseline', 
                                                                                      MLFLOW_URL, 
                                                                                      Variable.get("AWS_ACCESS_KEY_ID"), 
                                                                                      Variable.get("AWS_SECRET_ACCESS_KEY"),
