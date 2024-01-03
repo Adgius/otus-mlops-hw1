@@ -4,14 +4,13 @@ import sys
 
 import pyspark.sql.types as T
 import pyspark.sql.functions as F
+import mlflow
 import logging
 import boto3
 import warnings
 
 from functools import reduce
 from datetime import datetime as dt
-
-from pyspark import SparkConf
 
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.window import Window
@@ -196,18 +195,19 @@ def main(args):
     experiment_id = experiment.experiment_id
     run_name = 'My run name' + ' ' + str(dt.datetime.now())
 
-    logger.info("Creating Spark Session ...")
-    conf = SparkConf()
-    conf.setAppName('mytestapp')
-    spark = SparkSession.builder.config(conf=conf).getOrCreate()
-    sql = SQLContext(sparkContext=spark.sparkContext, sparkSession=spark)
-
-    import mlflow
-
     with mlflow.start_run(run_name=run_name, experiment_id=experiment_id):
         logger.info("tracking URI: %s", {mlflow.get_tracking_uri()})
 
-
+        logger.info("Creating Spark Session ...")
+        spark = SparkSession\
+                .builder\
+                .appName("mytestapp")\
+                .config("spark.jars.packages", "org.mlflow:mlflow-spark:1.27.0")\
+                .config("spark.jars.packages", "com.amazonaws:aws-java-sdk-pom:1.10.34")\
+                .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.2")\
+                .config("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")\
+                .getOrCreate()
+        sql = SQLContext(sparkContext=spark.sparkContext, sparkSession=spark)
 
         logger.info("Loading Data ...")
         dfs = []

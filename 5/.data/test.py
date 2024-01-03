@@ -1,19 +1,15 @@
-from pyspark import SparkConf
-from pyspark import SparkContext
+from pyspark.sql import SparkSession, SQLContext
 
-conf = SparkConf()
-conf.setAppName('spark-yarn')
-sc = SparkContext(conf=conf)
+spark = SparkSession\
+        .builder\
+        .appName("mytestapp")\
+        .config("spark.jars.packages", "org.mlflow:mlflow-spark:1.27.0")\
+        .config("spark.jars.packages", "com.amazonaws:aws-java-sdk-pom:1.10.34")\
+        .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.2")\
+        .config("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")\
+        .getOrCreate()
+sql = SQLContext(sparkContext=spark.sparkContext, sparkSession=spark)
 
-def some_function(x):
-    # Packages are imported and available from your bundled environment.
-    import mlflow
+import mlflow
 
-    # Use the libraries to do work
-    return x**2 + 2
-
-rdd = (sc.parallelize(range(1000))
-         .map(some_function)
-         .take(10))
-
-print(rdd)
+print(mlflow.__version__)
