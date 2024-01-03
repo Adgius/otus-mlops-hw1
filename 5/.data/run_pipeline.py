@@ -128,7 +128,7 @@ class FeatureGenerator(Transformer, MLReadable, MLWritable):
         df = df.withColumn("sum_fraud_terminal_id_count_30", F.sum("tx_fraud").over(w6))
         return df
 
-def read_csv(s3obj, limit=100000):
+def read_csv(s3obj, spark, limit=100000):
 
     def try_convert(x, func):
         try:
@@ -247,7 +247,7 @@ def main(args):
         logger.info("Loading Data ...")
         dfs = []
         for data in data_bucket.objects.all():
-            dfs.append(read_csv(data, limit=100000))
+            dfs.append(read_csv(data, spark, limit=100000))
 
         df = reduce(DataFrame.unionAll, dfs)
 
