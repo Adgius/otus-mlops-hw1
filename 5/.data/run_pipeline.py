@@ -136,8 +136,8 @@ def read_csv(s3obj, limit=100000):
         except:
             return float('nan')
 
-    rdd = sc.textFile(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key))
-    rdd = sc.parallelize(rdd.take(limit))
+    rdd = spark.read.text(path).rdd
+    rdd = spark.sparkContext.parallelize(rdd.take(limit))
     bad_header =  rdd.first()
     rdd = rdd.filter(lambda line: line != bad_header)
     temp_var = rdd.map(lambda row: row.split(","))
