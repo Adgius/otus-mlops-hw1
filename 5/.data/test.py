@@ -1,10 +1,19 @@
-import sys
-import logging
-import os
-import mlflow
+from pyspark import SparkConf
+from pyspark import SparkContext
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
-logger = logging.getLogger()
-logger.info("Python path: {}".format(sys.executable))
-logger.info("Python version: {}".format(sys.version))
-logger.info(os.environ)
+conf = SparkConf()
+conf.setAppName('spark-yarn')
+sc = SparkContext(conf=conf)
+
+def some_function(x):
+    # Packages are imported and available from your bundled environment.
+    import mlflow
+
+    # Use the libraries to do work
+    return x**2 + 2
+
+rdd = (sc.parallelize(range(1000))
+         .map(some_function)
+         .take(10))
+
+print(rdd)
