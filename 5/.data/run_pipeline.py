@@ -136,7 +136,7 @@ def read_csv(s3obj, limit=100000):
         except:
             return float('nan')
 
-    rdd = spark.read.text(path).rdd
+    rdd = spark.read.text(os.path.join("s3a://" , s3obj.bucket_name, s3obj.key)).rdd
     rdd = spark.sparkContext.parallelize(rdd.take(limit))
     bad_header =  rdd.first()
     rdd = rdd.filter(lambda line: line != bad_header)
@@ -247,7 +247,7 @@ def main(args):
         logger.info("Loading Data ...")
         dfs = []
         for data in data_bucket.objects.all():
-            dfs.append(df = read_csv(data, limit=100000))
+            dfs.append(read_csv(data, limit=100000))
 
         df = reduce(DataFrame.unionAll, dfs)
 
