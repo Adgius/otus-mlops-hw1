@@ -140,7 +140,7 @@ def read_csv(s3obj, spark, limit=100000):
     rdd = spark.sparkContext.parallelize(rdd.take(limit))
     bad_header =  rdd.first()
     rdd = rdd.filter(lambda line: line != bad_header)
-    temp_var = rdd.map(lambda row: row.split(","))
+    temp_var = rdd.map(lambda row: row.value.split(","))
     temp_var = temp_var.map(lambda row: (
                                      try_convert(row[0], int),
                                      try_convert(row[1], str), 
