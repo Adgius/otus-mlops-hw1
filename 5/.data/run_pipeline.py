@@ -10,7 +10,7 @@ import boto3
 import warnings
 
 from functools import reduce
-from datetime import datetime as dt
+import datetime as dt
 
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql.window import Window
