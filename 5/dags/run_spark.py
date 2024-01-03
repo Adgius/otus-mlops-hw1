@@ -55,6 +55,8 @@ with DAG(
     ssh_task3 = SSHOperator(
             task_id="train_model",
             command='bash -l -c "spark-submit --archives pyspark_venv.tar.gz#environment \
+            --master yarn \
+            --deploy-mode cluster \
             --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=./environment/bin/python \
             --jars mlflow-spark-1.27.0.jar\
              run_pipeline.py -o {} -u {} -k {} -s {} -r {} -e {}"'.format('baseline', 
