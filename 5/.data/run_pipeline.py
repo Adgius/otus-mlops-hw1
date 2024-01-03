@@ -99,13 +99,13 @@ class FeatureGenerator(Transformer, MLReadable, MLWritable):
         # время суток
         df = df.withColumn('day_night', F.when(F.hour(F.col('tx_datetime')) < 9, 1).otherwise(0))
 
-        w1 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(1), 0)
-        w2 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(7), 0)
-        w3 = Window().partitionBy("customer_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(30), 0)
+        w1 = Window().partitionBy("customer_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(1), 0)
+        w2 = Window().partitionBy("customer_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(7), 0)
+        w3 = Window().partitionBy("customer_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(30), 0)
 
-        w4 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(1), 0)
-        w5 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(7), 0)
-        w6 = Window().partitionBy("terminal_id").orderBy(F.asc(F.col("tx_datetime").cast("long"))).rangeBetween(-days(30), 0)
+        w4 = Window().partitionBy("terminal_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(1), 0)
+        w5 = Window().partitionBy("terminal_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(7), 0)
+        w6 = Window().partitionBy("terminal_id").orderBy(F.col("tx_datetime").cast("long").asc()).rangeBetween(-days(30), 0)
 
         # скользящее среднее числа транзакций по каждой карте
         df = df.withColumn("avg_transaction_count_1", F.count("tranaction_id").over(w1))
