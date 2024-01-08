@@ -23,8 +23,8 @@ def main(args):
         "kafka.sasl.mechanism": "PLAIN",
         "kafka.security.protocol" : "PLAINTEXT",
         "kafka.bootstrap.servers": f'{IP}:9092',
-        "group.id": 'test_group',
-        "subscribe": 'test',
+        "group.id": 'train_group',
+        "subscribe": 'train',
         "startingOffsets": "earliest",
     }
 
@@ -32,7 +32,7 @@ def main(args):
         "kafka.sasl.mechanism": "PLAIN",
         "kafka.security.protocol" : "PLAINTEXT",
         "kafka.bootstrap.servers": f'{IP}:9092',
-        "topic": "test"
+        "topic": "predict"
     }
 
     schema = t.StructType(
