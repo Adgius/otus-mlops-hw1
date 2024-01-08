@@ -72,8 +72,6 @@ def main(args):
     # Предсказание на потоковых данных с помощью модели
     predictions = model.transform(vectorized_data)
 
-    # Определение настроек для записи данных в Kafka
-
 
     # Запись предсказаний в Kafka
     stream_writer = predictions.select(to_json(struct([predictions['y'], predictions['prediction']])).alias("value")) \
@@ -84,7 +82,7 @@ def main(args):
         .start()
 
     # Запуск потока обработки
-    stream_writer.awaitTermination()
+    stream_writer.awaitTermination(5)
 
 if __name__ == "__main__":
 
