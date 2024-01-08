@@ -76,7 +76,7 @@ def main(args):
 
 
     # Запись предсказаний в Kafka
-    stream_writer = predictions.select(to_json(struct([predictions['y'], predictions['prediction']]))).alias("value") \
+    stream_writer = predictions.select(to_json(struct([predictions['y'], predictions['prediction']])).alias("value")) \
         .writeStream \
         .format("kafka") \
         .outputMode("append") \
