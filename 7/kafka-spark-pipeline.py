@@ -46,6 +46,7 @@ def main(args):
         .builder\
         .appName("MySparkApp")\
         .config("spark.jars.packages", 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.3')\
+        .config("spark.sql.streaming.checkpointLocation", "/tmp/ubuntu/checkpoint")\
         .getOrCreate()
 
     df = spark \
@@ -87,11 +88,12 @@ def main(args):
 
 
     # Запись предсказаний в Kafka
-    stream_writer = predictions.writeStream \
+    stream_writer = predictions.select(col("prediction").alias("value").cast(t.StringType()))\
+        .writeStream \
         .format("kafka") \
         .outputMode("append") \
         .options(**write_kafka_params) \
-        .start().awaitTermination()
+        .start()
 
     # Запуск потока обработки
     stream_writer.awaitTermination()
