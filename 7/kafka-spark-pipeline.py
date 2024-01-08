@@ -1,15 +1,12 @@
 import argparse
-import pyspark
-from pyspark import SparkContext
+
 from pyspark.sql import SparkSession
-from pyspark.streaming import StreamingContext
-from pyspark.sql.functions import from_json, col
+from pyspark.sql.functions import from_json, col, to_json, struct
 from pyspark.sql import functions as F
 from pyspark.sql import types as t
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.feature import VectorAssembler
-import os
 
 def process_batch(df, batch_id):
     df.write \
@@ -45,7 +42,6 @@ def main(args):
     spark = SparkSession\
         .builder\
         .appName("MySparkApp")\
-        .config("spark.jars.packages", 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.3')\
         .config("spark.sql.streaming.checkpointLocation", "/tmp/ubuntu/checkpoint")\
         .getOrCreate()
 
@@ -78,17 +74,9 @@ def main(args):
 
     # Определение настроек для записи данных в Kafka
 
-    write_kafka_params = {
-        # "kafka.sasl.jaas.config": 'org.apache.kafka.common.security.plain.PlainLoginModule required username="mlops" password="mlops_pw";',
-        "kafka.sasl.mechanism": "PLAIN",
-        "kafka.security.protocol" : "PLAINTEXT",
-        "kafka.bootstrap.servers": '158.160.70.184:9092',
-        "topic": "test"
-    }
-
 
     # Запись предсказаний в Kafka
-    stream_writer = predictions.select(col("prediction").alias("value").cast(t.StringType()))\
+    stream_writer = predictions.select(to_json(struct([predictions['y'], predictions['prediction']]))).alias("value") \
         .writeStream \
         .format("kafka") \
         .outputMode("append") \
