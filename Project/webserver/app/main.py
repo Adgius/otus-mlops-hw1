@@ -1,16 +1,28 @@
 import os
 import datetime as dt
 import json
+import sys
 
 from fastapi import FastAPI, Request, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, dir_path)
+
+# Удалить
+from dotenv import load_dotenv
+load_dotenv()
+###########
+
 from pages.insights import *
 from pages.right_side import *
 from pages.rating_source import *
 from pages.table_comments import Query_Handler
+
+
+
 
 templates = Jinja2Templates(directory="templates")
 
@@ -111,8 +123,3 @@ def get_base_page(request: Request, date: str = '2023-11-15'): # dt.datetime.now
               'comments': comments
               }
     return templates.TemplateResponse("index.html", params)
-
-@app.on_event("shutdown")
-def disconnect():
-    #Disconnect from bd
-    pass

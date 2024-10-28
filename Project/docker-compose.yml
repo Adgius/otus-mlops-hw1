@@ -37,9 +37,9 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ${PWD}/airflow/dags:/opt/airflow/dags
-      - ${PWD}/airflow/logs:/opt/airflow/logs
-      - ${PWD}/airflow/plugins:/opt/airflow/plugins 
+      - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
+      - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
+      - ${AIRFLOW_PROJ_DIR:-.}/airflow/plugins:/opt/airflow/plugins 
 
   jupyter_notebook:
     image: jupyter/scipy-notebook
@@ -51,7 +51,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ${PWD}/jupyter:/home/jovyan/work
+      - ${AIRFLOW_PROJ_DIR:-.}/jupyter:/home/jovyan/work
     depends_on:
       - database
 

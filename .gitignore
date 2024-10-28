@@ -1,3 +1,10 @@
 **/__pycache__
 **/ssh/*
 **/logs/*
+**/.ipynb_checkpoints
+**/.venv
+Project/webserver/app/start.bat
+Project/webserver/app/.env
+Project/webserver/Untitled.ipynb
+Project/webserver/.python-version
+

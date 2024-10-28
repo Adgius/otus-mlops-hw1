@@ -8,8 +8,9 @@ x = ['2023-11-15', '2023-11-16', '2023-11-17', '2023-11-18',
                '2023-12-05', '2023-12-06']
 
 def random_generate(min_, max_, n):
-	x = np.random.rand(n)
-	return  list(x * (max_ - min_) + min_)
+    x = np.random.rand(n)
+    x = x * (max_ - min_) + min_
+    return  x.tolist()
 
 def get_gp_score():
     y = random_generate(3.5, 5, len(x))
