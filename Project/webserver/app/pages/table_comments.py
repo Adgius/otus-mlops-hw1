@@ -1,3 +1,5 @@
+# https://habr.com/ru/articles/273253/
+
 import os
 from sqlalchemy import select
 from sqlalchemy import create_engine, MetaData, Table, select, func, not_

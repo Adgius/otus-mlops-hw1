@@ -40,21 +40,7 @@ services:
       - ${AIRFLOW_PROJ_DIR:-.}/airflow/dags:/opt/airflow/dags
       - ${AIRFLOW_PROJ_DIR:-.}/airflow/logs:/opt/airflow/logs
       - ${AIRFLOW_PROJ_DIR:-.}/airflow/plugins:/opt/airflow/plugins 
-
-  jupyter_notebook:
-    image: jupyter/scipy-notebook
-    container_name: jupyter_notebook
-    command: sudo chown -R jovyan:users /home/jovyan/*
-    environment:
-      JUPYTER_ENABLE_LAB: "yes"
-      JUPYTER_TOKEN: ${JUPYTER_TOKEN}
-    ports:
-      - "8888:8888"
-    volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}/jupyter:/home/jovyan/work
-    depends_on:
-      - database
-
+      
   database:
     build: 
       context: ./pgvector
